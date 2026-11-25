@@ -5,6 +5,7 @@ import {
   Building2,
   Check,
   CheckCircle2,
+  Cpu,
   Globe,
   HeartPulse,
   MapPin,
@@ -12,7 +13,10 @@ import {
   ShieldCheck,
   GraduationCap,
   Briefcase,
+  Sprout,
   TrendingUp,
+  Wifi,
+  Wind,
 } from 'lucide-react';
 import { useCampaign } from '../context/CampaignContext';
 import { KATSINA_INEC_META } from '../data/katsinaInecData';
@@ -42,33 +46,100 @@ const WELCOME_TARGET_LGAS = [
   { id: 'batsari', label: 'Batsari' },
 ] as const;
 
-const AGENDA_PILLARS = [
+type AgendaCategory =
+  | 'Security & Human Capital'
+  | 'Clean Energy & Infrastructure'
+  | 'Technology, AI & Connectivity'
+  | 'Economy & Enterprise';
+
+interface AgendaPillar {
+  number: string;
+  category: AgendaCategory;
+  title: string;
+  summary: string;
+  deliverable: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+const AGENDA_CATEGORIES: Array<'All' | AgendaCategory> = [
+  'All',
+  'Technology, AI & Connectivity',
+  'Clean Energy & Infrastructure',
+  'Security & Human Capital',
+  'Economy & Enterprise',
+];
+
+const AGENDA_PILLARS: AgendaPillar[] = [
   {
     number: '01',
+    category: 'Security & Human Capital',
     title: 'Security & Community Peace Restoration',
     summary:
-      'Coordinated state-federal security collaboration, early-warning local intelligence networks, and community policing support across all 34 Katsina LGAs.',
+      'Coordinated state-federal security architecture, early-warning local intelligence networks, safe rural transit corridors, and community policing support across all 34 Katsina LGAs.',
+    deliverable: 'LGA-wide rapid-response coordination & corridor security',
     icon: ShieldCheck,
   },
   {
     number: '02',
-    title: 'Free Education & School Renewal',
+    category: 'Security & Human Capital',
+    title: 'Free Education, STEM & Digital Literacy',
     summary:
-      'Comprehensive free public education for state indigenes paired with classroom reconstruction, teacher support, and vocational skills pipelines.',
+      'Comprehensive free public education for state indigenes paired with classroom reconstruction, teacher support, modern STEM laboratories, and coding & vocational skills pipelines.',
+    deliverable: 'Tuition-free public schooling & modern STEM labs',
     icon: GraduationCap,
   },
   {
     number: '03',
+    category: 'Security & Human Capital',
     title: 'Zonal Healthcare Expansion',
     summary:
-      'Modern medical centers across Katsina Central, North (Daura), and South (Funtua) senatorial zones with reliable essential medicine supply.',
+      'Modern diagnostic and referral medical centers across Katsina Central, North (Daura), and South (Funtua) senatorial zones powered by reliable essential medicine supply chains.',
+    deliverable: '24/7 solar-backed primary & zonal specialist care',
     icon: HeartPulse,
   },
   {
     number: '04',
+    category: 'Clean Energy & Infrastructure',
+    title: 'Rimi Wind Power Revival & Renewable Grid',
+    summary:
+      'Full rehabilitation, modernization, and grid integration of the landmark Rimi Wind Mill Power Project in Katsina alongside decentralized solar microgrids for hospitals, schools, and agro-clusters.',
+    deliverable: 'Rimi Wind Farm revival & hybrid solar-wind microgrids',
+    icon: Wind,
+  },
+  {
+    number: '05',
+    category: 'Technology, AI & Connectivity',
+    title: 'Artificial Intelligence & Smart Governance',
+    summary:
+      'Deploying applied Artificial Intelligence for crop-yield forecasting, healthcare triage, transparent public e-procurement, and modern civil-service workflows paired with youth AI fellowships.',
+    deliverable: 'Applied AI centers & transparent digital public procurement',
+    icon: Cpu,
+  },
+  {
+    number: '06',
+    category: 'Technology, AI & Connectivity',
+    title: 'Free Public Internet & Innovation Hubs',
+    summary:
+      'Deploying open-access free community Wi-Fi nodes and fiber-backed innovation hubs across campuses, libraries, and civic centers nationwide to accelerate startups, remote work, and youth innovation.',
+    deliverable: 'Free community internet zones & 34-LGA innovation hubs',
+    icon: Wifi,
+  },
+  {
+    number: '07',
+    category: 'Economy & Enterprise',
+    title: 'Climate-Smart Agriculture & Agro-Zones',
+    summary:
+      'Year-round dry-season irrigation, mechanized farmer cooperatives, solar-powered cold storage, and value-added agro-processing hubs linking rural producers across 361 wards to regional markets.',
+    deliverable: 'Solar cold-chain storage & mechanized ward cooperatives',
+    icon: Sprout,
+  },
+  {
+    number: '08',
+    category: 'Economy & Enterprise',
     title: 'Civil Service Reform & Youth Enterprise',
     summary:
-      'Sustainable pension arrangements for public servants alongside structured agricultural modernization and enterprise financing for women and youth.',
+      'Sustainable pension guarantees for public servants alongside structured MSME capital, digital skills grants, and enterprise financing for women and young founders.',
+    deliverable: 'Protected pensions & transparent MSME venture funds',
     icon: Briefcase,
   },
 ];
@@ -84,6 +155,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
   const { branding, stateSummaries, selectedStateCode, setSelectedStateCode, metrics } =
     useCampaign();
   const [mapLayer, setMapLayer] = useState<'coverage' | 'incidents' | 'reports'>('coverage');
+  const [agendaCategory, setAgendaCategory] = useState<'All' | AgendaCategory>('All');
+
+  const filteredAgendaPillars = useMemo(
+    () =>
+      agendaCategory === 'All'
+        ? AGENDA_PILLARS
+        : AGENDA_PILLARS.filter((p) => p.category === agendaCategory),
+    [agendaCategory]
+  );
 
   // Interactive Welcome Hero LGA capture toggles: visitors immediately see Lado winning Katsina
   // and can toggle capturing key target LGAs to watch votes & winning margin recalculate live.
@@ -550,60 +630,161 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
           </div>
         </section>
 
-        {/* Four-Point Governance Agenda — Asymmetric Editorial Bento */}
+        {/* Eight-Point Governance & Innovation Agenda — Editorial & Strategic Pillars */}
         <section id="agenda" className="bg-white border-y border-slate-200/80 py-14 lg:py-20">
           <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 space-y-8 lg:space-y-10">
-            <div className="max-w-2xl space-y-2">
-              <div className="text-xs font-semibold text-emerald-800">
-                Governance Blueprint
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+              <div className="max-w-2xl space-y-2">
+                <div className="text-xs font-semibold text-emerald-800">
+                  Governance & Innovation Blueprint
+                </div>
+                <h2 className="text-2xl lg:text-3xl font-bold font-display tracking-tight text-slate-950">
+                  Eight Priorities for Security, Clean Energy, AI &amp; Economic Dignity
+                </h2>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  A disciplined development pact uniting community security and social renewal with the revival of the Rimi Wind Power project, applied Artificial Intelligence, and open-access public internet hubs for youth innovation.
+                </p>
               </div>
-              <h2 className="text-2xl lg:text-3xl font-bold font-display tracking-tight text-slate-950">
-                Four Priorities for Security, Renewal & Economic Dignity
-              </h2>
+
+              <div
+                role="tablist"
+                aria-label="Filter governance agenda pillars"
+                className="flex flex-wrap items-center gap-1.5 bg-slate-100/90 border border-slate-200 p-1 rounded-xl shrink-0"
+              >
+                {AGENDA_CATEGORIES.map((category) => {
+                  const active = agendaCategory === category;
+                  const count =
+                    category === 'All'
+                      ? AGENDA_PILLARS.length
+                      : AGENDA_PILLARS.filter((p) => p.category === category).length;
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setAgendaCategory(category)}
+                      className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+                        active
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-950'
+                      }`}
+                    >
+                      {category} ({count})
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-              {/* Featured Civic Horizon Visual */}
-              <div className="lg:col-span-5 relative rounded-2xl overflow-hidden border border-slate-200 min-h-[280px] sm:min-h-[340px]">
-                <img
-                  src={civicHorizonSrc}
-                  alt="Katsina State Civic Heritage & Modern Infrastructure Vision"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent p-5 sm:p-6 text-white">
-                  <div className="flex items-center gap-2 text-xs text-emerald-300 font-medium">
-                    <Building2 className="w-3.5 h-3.5" />
-                    Katsina State Development Vision
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Civic Horizon Visual + Flagship Tech & Clean Energy Commitments */}
+              <div className="lg:col-span-4 space-y-4">
+                <div className="relative rounded-2xl overflow-hidden border border-slate-200 min-h-[260px] sm:min-h-[300px]">
+                  <img
+                    src={civicHorizonSrc}
+                    alt="Katsina State Civic Heritage & Modern Infrastructure Vision"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/92 via-slate-950/55 to-transparent p-5 text-white">
+                    <div className="flex items-center gap-2 text-xs text-emerald-300 font-medium">
+                      <Building2 className="w-3.5 h-3.5" />
+                      Katsina State Development Vision
+                    </div>
+                    <p className="text-sm font-medium mt-1.5 leading-snug text-slate-100">
+                      Building safe communities, clean renewable power corridors, and modern digital infrastructure across Katsina Central, Daura, and Funtua zones.
+                    </p>
                   </div>
-                  <p className="text-sm font-medium mt-1.5 leading-snug text-slate-100">
-                    Building safe communities, accountable public institutions, and thriving economic corridors across Katsina Central, Daura, and Funtua zones.
-                  </p>
+                </div>
+
+                <div className="bg-[#0A0F1A] text-white rounded-2xl border border-slate-800 p-5 space-y-4">
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
+                      Flagship Transformation Tracks
+                    </div>
+                    <h3 className="text-base font-bold font-display text-white mt-1">
+                      Clean Power, AI &amp; Open Connectivity
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="flex items-start gap-3 pb-3 border-b border-slate-800/90">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                        <Wind className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-white">Rimi Wind Mill Power Revival</div>
+                        <p className="text-slate-400 leading-relaxed mt-0.5">
+                          Restoring Katsina&apos;s flagship Rimi wind energy installation integrated with regional solar microgrids.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 pb-3 border-b border-slate-800/90">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
+                        <Cpu className="w-4 h-4 text-sky-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-white">Artificial Intelligence Readiness</div>
+                        <p className="text-slate-400 leading-relaxed mt-0.5">
+                          Applied AI in agri-forecasting, diagnostics, and open digital governance alongside youth AI fellowships.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                        <Wifi className="w-4 h-4 text-amber-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-white">Free Public Internet &amp; Hubs</div>
+                        <p className="text-slate-400 leading-relaxed mt-0.5">
+                          Deploying open community Wi-Fi access zones across campuses, libraries, and LGAs to power local innovators.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Numbered Editorial Pillars */}
-              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {AGENDA_PILLARS.map((pillar) => {
+              {/* Right Column: Numbered Editorial Policy Pillars */}
+              <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {filteredAgendaPillars.map((pillar) => {
                   const Icon = pillar.icon;
                   return (
                     <div
                       key={pillar.number}
-                      className="bg-[#F8F9FA] border border-slate-200/90 rounded-xl p-5 sm:p-6 flex flex-col justify-between gap-4"
+                      className="bg-[#F8F9FA] border border-slate-200/90 hover:border-emerald-700/40 rounded-xl p-5 sm:p-6 flex flex-col justify-between gap-4 transition-colors"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono font-semibold text-slate-400">
-                          {pillar.number}.
-                        </span>
-                        <Icon className="w-4 h-4 text-emerald-800" />
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-xs font-mono font-semibold text-slate-400 shrink-0">
+                              {pillar.number}.
+                            </span>
+                            <span className="text-[11px] font-semibold text-emerald-800 truncate">
+                              {pillar.category}
+                            </span>
+                          </div>
+                          <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0">
+                            <Icon className="w-4 h-4 text-emerald-800" />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <h3 className="text-base font-bold text-slate-950 leading-snug">
+                            {pillar.title}
+                          </h3>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            {pillar.summary}
+                          </p>
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <h3 className="text-base font-bold text-slate-950 leading-snug">
-                          {pillar.title}
-                        </h3>
-                        <p className="text-xs text-slate-600 leading-relaxed">
-                          {pillar.summary}
-                        </p>
+
+                      <div className="pt-3 border-t border-slate-200/80 flex items-center gap-1.5 text-[11px] font-medium text-slate-700">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        <span>{pillar.deliverable}</span>
                       </div>
                     </div>
                   );

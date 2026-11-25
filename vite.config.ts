@@ -16,6 +16,22 @@ export default defineConfig(() => {
       {
         name: 'prepare-vercel-dist-assets',
         apply: 'build',
+        transformIndexHtml(html: string) {
+          const rawHost = (
+            process.env.VITE_SITE_URL ||
+            process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+            process.env.VERCEL_URL ||
+            ''
+          ).trim();
+          if (!rawHost) return html;
+          const origin = rawHost.startsWith('http') ? rawHost.replace(/\/+$/, '') : `https://${rawHost.replace(/\/+$/, '')}`;
+          return html
+            .replace(/content="\/og-lado\.jpg"/g, `content="${origin}/og-lado.jpg"`)
+            .replace(
+              '<meta property="og:type" content="website" />',
+              `<meta property="og:type" content="website" />\n    <meta property="og:url" content="${origin}/" />`
+            );
+        },
         closeBundle(error?: Error): void {
           if (error) {
             return;
