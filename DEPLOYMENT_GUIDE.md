@@ -19,7 +19,7 @@ This repository is pre-configured for zero-config deployment on Vercel via `/ver
 
 1. **Build & Output Settings** (`/vercel.json`):
    - Framework preset: `vite`
-   - Install command: `npm ci` (uses `package-lock.json` and avoids stale lockfile conflicts)
+   - Install command: `npm install --no-audit --no-fund` (cross-platform safe across Windows/macOS/Linux optional native dependencies)
    - Build command: `npm run build`
    - Output directory: `dist`
    - URL normalization: `cleanUrls: true`, `trailingSlash: false`
