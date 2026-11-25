@@ -543,7 +543,7 @@ export const AdminGeographyWardsTab: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <div className="relative flex-1 min-w-[220px]">
+                <div className="relative w-full sm:flex-1 sm:min-w-[220px]">
                   <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
@@ -649,7 +649,7 @@ export const AdminGeographyWardsTab: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <div className="relative flex-1 min-w-[200px]">
+                <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
                   <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"

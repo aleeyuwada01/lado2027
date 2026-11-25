@@ -363,12 +363,14 @@ export const KatsinaSimulatorView: React.FC = () => {
           </div>
 
           {/* Live Global Simulation Sliders */}
-          <div className="flex flex-wrap items-center gap-5 text-xs bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3">
-            <div className="flex items-center gap-2.5">
-              <Sliders className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <label htmlFor="sim-turnout-rate" className="text-slate-300 whitespace-nowrap">
-                Turnout: <span className="font-mono font-bold text-white">{Math.round(config.turnoutRate * 100)}%</span>
-              </label>
+          <div className="grid grid-cols-1 sm:flex sm:flex-wrap items-center gap-3.5 sm:gap-5 text-xs bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 w-full lg:w-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5">
+              <div className="flex items-center gap-2">
+                <Sliders className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <label htmlFor="sim-turnout-rate" className="text-slate-300 whitespace-nowrap">
+                  Turnout: <span className="font-mono font-bold text-white">{Math.round(config.turnoutRate * 100)}%</span>
+                </label>
+              </div>
               <input
                 id="sim-turnout-rate"
                 type="range"
@@ -379,11 +381,11 @@ export const KatsinaSimulatorView: React.FC = () => {
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, turnoutRate: Number(e.target.value) / 100 }))
                 }
-                className="w-24 sm:w-28 accent-emerald-500 cursor-pointer"
+                className="w-full sm:w-28 h-8 sm:h-auto accent-emerald-500 cursor-pointer"
               />
             </div>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2.5">
               <label htmlFor="sim-adc-factor" className="text-slate-300 whitespace-nowrap">
                 ADC Factor: <span className="font-mono font-bold text-amber-400">{config.adcSurgeFactor.toFixed(1)}x</span>
               </label>
@@ -397,7 +399,7 @@ export const KatsinaSimulatorView: React.FC = () => {
                 onChange={(e) =>
                   setConfig((prev) => ({ ...prev, adcSurgeFactor: Number(e.target.value) / 10 }))
                 }
-                className="w-20 sm:w-24 accent-amber-500 cursor-pointer"
+                className="w-full sm:w-24 h-8 sm:h-auto accent-amber-500 cursor-pointer"
               />
             </div>
           </div>
@@ -472,15 +474,15 @@ export const KatsinaSimulatorView: React.FC = () => {
 
       {/* Primary Interactive Mapbox Studio + LGA/Ward Inspector */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
-        <div className="xl:col-span-8">
+        <div className="xl:col-span-8 min-w-0">
           <KatsinaMapboxViz
             simulation={simulation}
             selectedLgaId={selectedLgaId}
             onSelectLga={setSelectedLgaId}
-            heightClass="h-[360px] sm:h-[460px] xl:h-[540px]"
+            heightClass="h-[300px] sm:h-[440px] xl:h-[540px]"
           />
         </div>
-        <div className="xl:col-span-4">
+        <div className="xl:col-span-4 min-w-0">
           <KatsinaLgaInspector
             lgaResult={selectedLgaResult}
             onChangeTargetWards={handleChangeLgaTargetWards}
@@ -494,7 +496,7 @@ export const KatsinaSimulatorView: React.FC = () => {
       {/* Advanced Analytical Visualizations Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Chart 1: Senatorial Zone 4-Party Vote Comparison */}
-        <div className="bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-5">
+        <div className="min-w-0 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 sm:p-5">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-slate-950 dark:text-white font-display">
               Senatorial Zone Party Comparison (Katsina South · Central · North)
@@ -533,7 +535,7 @@ export const KatsinaSimulatorView: React.FC = () => {
         </div>
 
         {/* Chart 2: Turnout & Potential Reach Trajectory */}
-        <div className="bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-5">
+        <div className="min-w-0 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 sm:p-5">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-slate-950 dark:text-white font-display">
               Potential Reach & Turnout Sensitivity Curve (30% – 65% Turnout)

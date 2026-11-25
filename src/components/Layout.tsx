@@ -715,7 +715,7 @@ export const Layout: React.FC<LayoutProps> = ({
         )}
 
         {/* Main Workspace Viewport */}
-        <main className="relative flex-1 p-3.5 sm:p-5 lg:p-8 pb-20 lg:pb-8 max-w-[1560px] w-full mx-auto">
+        <main className="relative flex-1 p-3.5 sm:p-5 lg:p-8 pb-24 lg:pb-8 max-w-[1560px] w-full mx-auto min-w-0">
           <CampaignLoader
             visible={moduleTransitioning}
             variant="overlay"
@@ -726,11 +726,11 @@ export const Layout: React.FC<LayoutProps> = ({
           {children}
         </main>
 
-        {/* Mobile-First Thumb-Zone 5-Tab Quick Navigation Bar (56px, lg:hidden) */}
+        {/* Mobile-First Thumb-Zone 5-Tab Quick Navigation Bar (56px + safe-area, lg:hidden) */}
         <nav
           aria-label="Mobile Quick Navigation"
           data-testid="mobile-bottom-nav"
-          className="no-print fixed bottom-0 inset-x-0 z-40 lg:hidden h-14 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 grid grid-cols-5"
+          className="no-print fixed bottom-0 inset-x-0 z-40 lg:hidden min-h-[56px] pb-safe bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 grid grid-cols-5"
         >
           {(
             [

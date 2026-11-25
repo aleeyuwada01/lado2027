@@ -126,18 +126,18 @@ export const IncidentsView: React.FC = () => {
             7-stage workflow (New → Closed) · Strict separation between Verified Facts, Unverified Reports, and Allegations
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setShowMap((m) => !m)}
-            className="px-3 py-1.5 text-xs font-medium border border-slate-300 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800"
+            className="flex-1 sm:flex-none px-3 py-2 sm:py-1.5 min-h-[38px] sm:min-h-0 text-xs font-medium border border-slate-300 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap"
           >
             {showMap ? 'Hide Incident Map' : 'Show Incident Map'}
           </button>
           <button
             type="button"
             onClick={() => setShowCreate((s) => !s)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white rounded-md"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 min-h-[38px] sm:min-h-0 text-xs font-semibold text-white rounded-md whitespace-nowrap"
             style={{ backgroundColor: branding.primaryColor }}
           >
             <Plus className="w-3.5 h-3.5" /> Log Incident

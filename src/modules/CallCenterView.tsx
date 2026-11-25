@@ -224,7 +224,7 @@ export const CallCenterView: React.FC = () => {
               <span className="text-[11px] text-slate-500">Manual Workflow Active</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium mb-1">Direction</label>
                 <select
@@ -251,7 +251,7 @@ export const CallCenterView: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium mb-1">Caller Name (Voluntary)</label>
                 <input
@@ -287,7 +287,7 @@ export const CallCenterView: React.FC = () => {
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium mb-1">State</label>
                 <select
@@ -455,7 +455,8 @@ export const CallCenterView: React.FC = () => {
               <Headphones className="w-4 h-4 text-slate-500" />
               <h3 className="text-xs font-bold">Operator Workload & Station Status</h3>
             </div>
-            <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="py-2.5 px-4 font-semibold">Operator</th>
@@ -491,6 +492,7 @@ export const CallCenterView: React.FC = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
 
           <div className="lg:col-span-5 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-md p-5 space-y-3">

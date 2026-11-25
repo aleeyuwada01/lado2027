@@ -361,7 +361,8 @@ export const LogisticsView: React.FC = () => {
             </form>
           )}
           <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-md overflow-hidden">
-            <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="py-2.5 px-4 font-semibold">Registration & Type</th>
@@ -402,6 +403,7 @@ export const LogisticsView: React.FC = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       )}
@@ -446,7 +448,7 @@ export const LogisticsView: React.FC = () => {
                           type="button"
                           onClick={() => adjustInventoryStock(item.id, -10)}
                           aria-label={`Issue 10 ${item.name}`}
-                          className="inline-flex items-center px-2 py-1 border border-slate-300 dark:border-slate-700 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+                          className="inline-flex items-center justify-center min-h-[36px] min-w-[44px] px-2.5 py-1 border border-slate-300 dark:border-slate-700 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                           <Minus className="w-3 h-3 mr-1" /> 10
                         </button>
@@ -454,7 +456,7 @@ export const LogisticsView: React.FC = () => {
                           type="button"
                           onClick={() => adjustInventoryStock(item.id, 50)}
                           aria-label={`Restock 50 ${item.name}`}
-                          className="inline-flex items-center px-2 py-1 border border-slate-300 dark:border-slate-700 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
+                          className="inline-flex items-center justify-center min-h-[36px] min-w-[44px] px-2.5 py-1 border border-slate-300 dark:border-slate-700 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
                         >
                           <Plus className="w-3 h-3 mr-1" /> 50
                         </button>
@@ -464,8 +466,8 @@ export const LogisticsView: React.FC = () => {
                 })}
               </tbody>
             </table>
+            </div>
           </div>
-        </div>
       )}
     </div>
   );

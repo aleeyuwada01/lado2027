@@ -172,7 +172,7 @@ export const ElectionDayView: React.FC = () => {
                       setReviewNotesMap((prev) => ({ ...prev, [rep.id]: e.target.value }))
                     }
                     placeholder="Reviewer verification notes..."
-                    className="flex-1 min-w-[200px] px-2.5 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded"
+                    className="w-full sm:flex-1 sm:min-w-[200px] px-2.5 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded"
                   />
                   <button
                     type="button"

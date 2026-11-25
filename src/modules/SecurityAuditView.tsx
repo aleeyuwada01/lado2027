@@ -123,7 +123,7 @@ export const SecurityAuditView: React.FC = () => {
       {tab === 'audit' && (
         <div className="bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
           <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
-            <div className="relative flex-1 min-w-[220px] max-w-md">
+            <div className="relative w-full sm:flex-1 sm:min-w-[220px] sm:max-w-md">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"

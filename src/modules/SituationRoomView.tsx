@@ -681,15 +681,15 @@ export const SituationRoomView: React.FC = () => {
       {/* Primary Interactive Command Grid: Katsina 34-LGA Mapbox Studio OR National 36+FCT Map */}
       {mapScope === 'katsina' ? (
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
-          <div className="xl:col-span-8">
+          <div className="xl:col-span-8 min-w-0">
             <KatsinaMapboxViz
               simulation={katsinaSim}
               selectedLgaId={selectedKatsinaLgaId}
               onSelectLga={setSelectedKatsinaLgaId}
-              heightClass="h-[360px] sm:h-[460px] xl:h-[540px]"
+              heightClass="h-[300px] sm:h-[440px] xl:h-[540px]"
             />
           </div>
-          <div className="xl:col-span-4">
+          <div className="xl:col-span-4 min-w-0">
             <KatsinaLgaInspector
               lgaResult={selectedKatsinaLga}
               onChangeTargetWards={handleChangeLgaTargetWards}
@@ -714,7 +714,7 @@ export const SituationRoomView: React.FC = () => {
                   key={key}
                   type="button"
                   onClick={() => setMapLayer(key)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+                  className={`px-3 py-2 sm:py-1.5 min-h-[36px] sm:min-h-[32px] text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                     mapLayer === key
                       ? 'bg-slate-900 dark:bg-slate-700 text-white'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white'
@@ -727,7 +727,7 @@ export const SituationRoomView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
-            <div className="xl:col-span-8">
+            <div className="xl:col-span-8 min-w-0">
               <NigeriaMap
                 stateSummaries={stateSummaries}
                 selectedStateCode={selectedStateCode}
@@ -737,7 +737,7 @@ export const SituationRoomView: React.FC = () => {
             </div>
 
             {/* Right Panel: Selected State Drill-Down */}
-            <div className="xl:col-span-4 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl flex flex-col">
+            <div className="xl:col-span-4 min-w-0 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl flex flex-col">
               <div className="px-5 py-4 border-b border-slate-200/90 dark:border-slate-800 flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-slate-950 dark:text-white font-display">
@@ -822,7 +822,7 @@ export const SituationRoomView: React.FC = () => {
 
       {/* Advanced Analytics Row: Katsina Zone Comparison + Turnout Reach Curve */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-5">
+        <div className="min-w-0 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 sm:p-5">
           <div className="flex items-center justify-between gap-2 mb-4">
             <div>
               <h3 className="text-sm font-bold text-slate-950 dark:text-white font-display">
@@ -869,7 +869,7 @@ export const SituationRoomView: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-5">
+        <div className="min-w-0 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 sm:p-5">
           <div className="mb-4">
             <h3 className="text-sm font-bold text-slate-950 dark:text-white font-display">
               Potential Reach & Turnout Sensitivity ({katsinaSim.totalRegisteredVoters.toLocaleString()} Oct 2026 INEC Voters)

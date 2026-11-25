@@ -633,7 +633,7 @@ export const VoterSentimentSidebar: React.FC<VoterSentimentSidebarProps> = ({
         onClick={onClose}
         className="flex-1 bg-slate-950/60 backdrop-blur-xs"
       />
-      <div className="w-full max-w-[380px] h-full shadow-2xl">{panelBody}</div>
+      <div className="w-[92vw] max-w-[380px] h-full shadow-2xl pb-safe bg-white dark:bg-[#0B1120]">{panelBody}</div>
     </div>
   );
 };

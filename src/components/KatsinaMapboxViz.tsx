@@ -745,7 +745,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
             Katsina Mapbox GL · 34 LGAs
           </span>
           <span className="text-slate-600 hidden sm:inline" aria-hidden="true">·</span>
-          <div className="inline-flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-lg overflow-x-auto max-w-full">
+          <div className="inline-flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-lg overflow-x-auto no-scrollbar max-w-full">
             {(
               [
                 ['simulation', 'Victory'],
@@ -758,7 +758,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
                 key={key}
                 type="button"
                 onClick={() => setVizMode(key)}
-                className={`px-2.5 py-1.5 min-h-[32px] text-[11px] font-medium rounded-md transition-colors whitespace-nowrap ${
+                className={`px-2.5 py-1.5 min-h-[36px] sm:min-h-[32px] text-[11px] font-medium rounded-md transition-colors whitespace-nowrap ${
                   vizMode === key
                     ? 'bg-emerald-700 text-white'
                     : 'text-slate-400 hover:text-white'
@@ -770,12 +770,12 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full shrink-0">
           <button
             type="button"
             onClick={() => setShowTerritories((t) => !t)}
             data-testid="toggle-territories-btn"
-            className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 min-h-[32px] text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] sm:min-h-[32px] text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap shrink-0 ${
               showTerritories
                 ? 'bg-emerald-950/90 text-emerald-300 border-emerald-700/80'
                 : 'bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700'
@@ -787,7 +787,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
           <button
             type="button"
             onClick={() => setShowHeatmap((h) => !h)}
-            className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 min-h-[32px] text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] sm:min-h-[32px] text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap shrink-0 ${
               showHeatmap
                 ? 'bg-emerald-950/90 text-emerald-300 border-emerald-700/80'
                 : 'bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700'
@@ -800,7 +800,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
             type="button"
             onClick={handleToggle3d}
             data-testid="toggle-3d-tilt-btn"
-            className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 min-h-[32px] text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] sm:min-h-[32px] text-[11px] font-medium rounded-md border transition-colors whitespace-nowrap shrink-0 ${
               is3dTilt
                 ? 'bg-amber-950/90 text-amber-300 border-amber-700/80'
                 : 'bg-slate-800/90 text-slate-200 border-slate-700 hover:bg-slate-700'
@@ -812,7 +812,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
           <button
             type="button"
             onClick={() => setBasemap((b) => (b === 'dark' ? 'light' : 'dark'))}
-            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 min-h-[32px] text-[11px] font-medium text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 rounded-md transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] sm:min-h-[32px] text-[11px] font-medium text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 rounded-md transition-colors whitespace-nowrap shrink-0"
           >
             <Layers className="w-3 h-3" />
             {basemap === 'dark' ? 'Light' : 'Dark'}
@@ -821,7 +821,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
             type="button"
             onClick={handleReset}
             aria-label="Reset map view"
-            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 min-h-[32px] text-[11px] font-medium text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 rounded-md transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 min-h-[36px] sm:min-h-[32px] text-[11px] font-medium text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 rounded-md transition-colors whitespace-nowrap shrink-0"
           >
             <RotateCcw className="w-3 h-3" />
             Reset
@@ -831,7 +831,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
 
       {/* Senatorial Zone Quick-Fly Bar + Mobile-First LGA Jump Select */}
       <div className="px-3.5 sm:px-4 py-2 bg-[#0D1322] border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-0.5 sm:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-0.5 sm:pb-0">
           <span className="text-slate-400 mr-0.5 shrink-0 hidden sm:inline">Zone:</span>
           {(
             [

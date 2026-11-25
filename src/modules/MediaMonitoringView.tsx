@@ -293,7 +293,7 @@ export const MediaMonitoringView: React.FC = () => {
         {/* Feed */}
         <div className="xl:col-span-2 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"

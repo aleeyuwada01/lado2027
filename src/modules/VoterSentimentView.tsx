@@ -671,7 +671,7 @@ export const VoterSentimentView: React.FC = () => {
       {/* Main Split: Filtered Live Stream (8 cols) + Rapid-Response Watch Queue (4 cols) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
         {/* Left: Full Multi-Axis Filtered Sentiment Stream */}
-        <div className="xl:col-span-8 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl overflow-hidden">
+        <div className="xl:col-span-8 min-w-0 bg-white dark:bg-[#0F172A] border border-slate-200/90 dark:border-slate-800 rounded-xl overflow-hidden">
           {/* Stream Filter Bar */}
           <div className="p-4 border-b border-slate-200 dark:border-slate-800 space-y-3 bg-slate-50/70 dark:bg-[#0B1120]">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -775,25 +775,27 @@ export const VoterSentimentView: React.FC = () => {
             </div>
 
             {/* Category Filter Chips + Watch-Only Toggle */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              {SENTIMENT_CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setCategory(cat)}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition-colors ${
-                    category === cat
-                      ? 'bg-[#0D5C38] text-white border-[#0D5C38]'
-                      : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
+              <div className="flex sm:flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-0.5 sm:pb-0">
+                {SENTIMENT_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategory(cat)}
+                    className={`px-2.5 py-1.5 sm:py-1 min-h-[34px] sm:min-h-0 rounded-md text-[11px] font-medium border transition-colors whitespace-nowrap shrink-0 ${
+                      category === cat
+                        ? 'bg-[#0D5C38] text-white border-[#0D5C38]'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={() => setActionableOnly((v) => !v)}
-                className={`ml-auto px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-colors ${
+                className={`w-full sm:w-auto sm:ml-auto px-3 py-1.5 sm:py-1 min-h-[34px] sm:min-h-0 rounded-md text-[11px] font-semibold border transition-colors whitespace-nowrap ${
                   actionableOnly
                     ? 'bg-amber-600 text-white border-amber-600'
                     : 'bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/70'

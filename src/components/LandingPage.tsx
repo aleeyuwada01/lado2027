@@ -293,6 +293,52 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
             </button>
           </div>
         </div>
+
+        {/* Mobile Quick-Jump Strip (<md) */}
+        <nav
+          aria-label="Mobile Quick Navigation"
+          className="md:hidden border-t border-slate-100 bg-white/95 px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-medium text-slate-600"
+        >
+          <a
+            href="#victory-simulation"
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center rounded-lg bg-slate-100/90 text-slate-800 whitespace-nowrap shrink-0"
+          >
+            Simulator
+          </a>
+          <a
+            href="#agenda"
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center rounded-lg bg-slate-100/90 text-slate-800 whitespace-nowrap shrink-0"
+          >
+            8-Point Agenda
+          </a>
+          <a
+            href="#leadership"
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center rounded-lg bg-slate-100/90 text-slate-800 whitespace-nowrap shrink-0"
+          >
+            Leadership
+          </a>
+          <a
+            href="#operations-map"
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center rounded-lg bg-slate-100/90 text-slate-800 whitespace-nowrap shrink-0"
+          >
+            Map
+          </a>
+          <button
+            type="button"
+            onClick={() => onEnterCommand('settings-admin')}
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center rounded-lg bg-slate-100/90 text-slate-800 whitespace-nowrap shrink-0"
+          >
+            States &amp; Wards
+          </button>
+          <button
+            type="button"
+            onClick={() => onEnterCommand('situation-room', { openSentiment: true })}
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold whitespace-nowrap shrink-0"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Sentiment
+          </button>
+        </nav>
       </header>
 
       <main id="top">
@@ -515,7 +561,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
 
               {/* Right Framed Editorial Portrait (No 'Garba' in tagname!) */}
               <div className="lg:col-span-5">
-                <div className="relative h-[360px] sm:h-[440px] lg:h-full lg:min-h-[520px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
+                <div className="relative h-[300px] sm:h-[420px] lg:h-full lg:min-h-[520px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
                   <img
                     src={portraitSrc}
                     alt={`Official editorial portrait of Senator ${branding.candidateName}`}
@@ -649,7 +695,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
               <div
                 role="tablist"
                 aria-label="Filter governance agenda pillars"
-                className="flex flex-wrap items-center gap-1.5 bg-slate-100/90 border border-slate-200 p-1 rounded-xl shrink-0"
+                className="flex sm:flex-wrap items-center gap-1.5 bg-slate-100/90 border border-slate-200 p-1 rounded-xl overflow-x-auto no-scrollbar max-w-full shrink-0"
               >
                 {AGENDA_CATEGORIES.map((category) => {
                   const active = agendaCategory === category;
@@ -664,7 +710,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
                       role="tab"
                       aria-selected={active}
                       onClick={() => setAgendaCategory(category)}
-                      className={`px-3 py-1.5 min-h-[34px] text-xs font-medium rounded-lg transition-colors whitespace-nowrap ${
+                      className={`px-3 py-2 sm:py-1.5 min-h-[38px] sm:min-h-[34px] text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 ${
                         active
                           ? 'bg-slate-900 text-white shadow-xs'
                           : 'text-slate-600 hover:text-slate-950'
@@ -868,7 +914,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
                 <span className="font-mono text-emerald-400">{metrics.agentsCheckedIn}</span>{' '}
                 checked-in field agents, and{' '}
                 <span className="font-mono text-white">{metrics.pollingUnitsTotal}</span> monitored
-                units across 20 integrated operational modules.
+                units across 21 integrated operational modules.
               </p>
             </div>
 
