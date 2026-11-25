@@ -53,10 +53,13 @@ import {
   DEMO_HANDOVER_AUDITS,
   DEMO_TRANSITION_ACTIONS,
 } from '../data/postElectionSeed';
+import { DEMO_EC8A_RESULTS } from '../data/ec8aSeed';
+import { validateEc8aSheet } from '../lib/ec8aCollation';
 import { promoteIdeaToActionItem } from '../lib/postElection';
 import type {
   AlertRule,
   Announcement,
+  AppLanguage,
   AuditLogEntry,
   CabinetPortfolioItem,
   CabinetVettingStatus,
@@ -67,6 +70,7 @@ import type {
   CampaignEvent,
   CampaignTask,
   CampaignUser,
+  Ec8aResultRecord,
   FieldCheckIn,
   FieldReport,
   FieldReportStatus,
@@ -97,6 +101,7 @@ import type {
 
 const BOOTSTRAPPED_ADMIN_EMAIL = 'Aleeyuwada01@gmail.com';
 const OFFLINE_QUEUE_KEY = 'yldm_offline_sync_queue_v1';
+const LANG_STORAGE_KEY = 'yldm_lang_v1';
 
 interface CampaignContextValue {
   activeModule: NavModuleId;
@@ -105,6 +110,9 @@ interface CampaignContextValue {
   setSelectedStateCode: (code: string) => void;
   darkMode: boolean;
   toggleDarkMode: () => void;
+  language: AppLanguage;
+  setLanguage: (lang: AppLanguage) => void;
+  toggleLanguage: () => void;
   fullscreenSituationRoom: boolean;
   setFullscreenSituationRoom: (v: boolean) => void;
   setupWizardOpen: boolean;
@@ -217,6 +225,14 @@ interface CampaignContextValue {
     patch: Partial<Pick<HandoverAuditItem, 'status' | 'notes' | 'owner'>>
   ) => void;
 
+  // Form EC8A Collation
+  ec8aResults: Ec8aResultRecord[];
+  submitEc8aResult: (
+    sheet: Omit<Ec8aResultRecord, 'id' | 'refCode' | 'status' | 'flagReason' | 'submittedAt'>
+  ) => Ec8aResultRecord;
+  verifyEc8aResult: (id: string) => void;
+  flagEc8aResult: (id: string, reason: string) => void;
+
   // Computed Real-Time Analytics
   metrics: ExecutiveMetrics;
   stateSummaries: Record<string, StateOperationalSummary>;
@@ -233,6 +249,22 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [activeModule, setActiveModule] = useState<NavModuleId>('situation-room');
   const [selectedStateCode, setSelectedStateCode] = useState<string>('KT');
   const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [language, setLanguageState] = useState<AppLanguage>(() => {
+    try {
+      return localStorage.getItem(LANG_STORAGE_KEY) === 'ha' ? 'ha' : 'en';
+    } catch {
+      return 'en';
+    }
+  });
+  const setLanguage = (lang: AppLanguage) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch {
+      // Ignore storage quota errors
+    }
+  };
+  const toggleLanguage = () => setLanguage(language === 'en' ? 'ha' : 'en');
   const [fullscreenSituationRoom, setFullscreenSituationRoom] = useState<boolean>(false);
   const [setupWizardOpen, setSetupWizardOpen] = useState<boolean>(false);
   const [commandSearchOpen, setCommandSearchOpen] = useState<boolean>(false);
@@ -294,6 +326,7 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     DEMO_CABINET_PORTFOLIOS
   );
   const [handoverAudits, setHandoverAudits] = useState<HandoverAuditItem[]>(DEMO_HANDOVER_AUDITS);
+  const [ec8aResults, setEc8aResults] = useState<Ec8aResultRecord[]>(DEMO_EC8A_RESULTS);
 
   // Sync CSS custom properties for dynamic campaign branding colors
   useEffect(() => {
@@ -583,6 +616,7 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setGovernanceIdeas((prev) => prev.filter((x) => !x.isDemo));
     setCabinetPortfolios((prev) => prev.filter((x) => !x.isDemo));
     setHandoverAudits((prev) => prev.filter((x) => !x.isDemo));
+    setEc8aResults((prev) => prev.filter((x) => !x.isDemo));
     appendAuditLog({
       action: 'DEMO_DATA_CLEARED',
       entity: 'System',
@@ -612,6 +646,7 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setGovernanceIdeas(DEMO_GOVERNANCE_IDEAS);
     setCabinetPortfolios(DEMO_CABINET_PORTFOLIOS);
     setHandoverAudits(DEMO_HANDOVER_AUDITS);
+    setEc8aResults(DEMO_EC8A_RESULTS);
     appendAuditLog({
       action: 'DEMO_DATA_RESEEDED',
       entity: 'System',
@@ -1491,6 +1526,75 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  const submitEc8aResult = (
+    sheet: Omit<Ec8aResultRecord, 'id' | 'refCode' | 'status' | 'flagReason' | 'submittedAt'>
+  ): Ec8aResultRecord => {
+    const id = makeId('ec8a');
+    const refCode = `KT-EC8A-${String(ec8aResults.length + 1).padStart(3, '0')}`;
+    const check = validateEc8aSheet(sheet);
+    const created: Ec8aResultRecord = {
+      ...sheet,
+      id,
+      refCode,
+      status: check.hasOverVoting ? 'Discrepancy Flagged' : 'Submitted',
+      flagReason: check.hasOverVoting
+        ? `Over-voting alert: ${check.totalCastVotes} cast votes exceeds ${sheet.accreditedVoters} accredited voters (+${check.overVotesBy}).`
+        : undefined,
+      submittedAt: new Date().toISOString(),
+    };
+    setEc8aResults((prev) => [created, ...prev]);
+    appendAuditLog({
+      action: check.hasOverVoting ? 'EC8A_FLAGGED' : 'EC8A_SUBMITTED',
+      entity: 'Ec8aResult',
+      entityId: refCode,
+      summary: `${refCode} (${sheet.lgaName}/${sheet.wardName}): PDP ${sheet.pdpVotes}, APC ${sheet.apcVotes}, ADC ${sheet.adcVotes}${check.hasOverVoting ? ` [OVER-VOTING +${check.overVotesBy}]` : ''}.`,
+      source: 'Mobile Field',
+    });
+    return created;
+  };
+
+  const verifyEc8aResult = (id: string) => {
+    const target = ec8aResults.find((r) => r.id === id);
+    setEc8aResults((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              status: 'Verified',
+              verifiedBy: currentUser.displayName,
+              flagReason: undefined,
+            }
+          : r
+      )
+    );
+    appendAuditLog({
+      action: 'EC8A_VERIFIED',
+      entity: 'Ec8aResult',
+      entityId: target?.refCode || id,
+      summary: `Verified Form EC8A ${target?.refCode || id} (${target?.lgaName || ''}).`,
+      source: 'Web Command',
+    });
+  };
+
+  const flagEc8aResult = (id: string, reason: string) => {
+    const target = ec8aResults.find((r) => r.id === id);
+    const cleanReason = reason.trim() || 'Flagged for physical EC8A sheet audit.';
+    setEc8aResults((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? { ...r, status: 'Discrepancy Flagged', flagReason: cleanReason }
+          : r
+      )
+    );
+    appendAuditLog({
+      action: 'EC8A_FLAGGED',
+      entity: 'Ec8aResult',
+      entityId: target?.refCode || id,
+      summary: `Flagged Form EC8A ${target?.refCode || id}: ${cleanReason}`,
+      source: 'Web Command',
+    });
+  };
+
   const syncOfflineQueue = () => {
     if (offlineQueue.length === 0) return;
     const count = offlineQueue.length;
@@ -1543,6 +1647,9 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setSelectedStateCode,
     darkMode,
     toggleDarkMode: () => setDarkMode((d) => !d),
+    language,
+    setLanguage,
+    toggleLanguage,
     fullscreenSituationRoom,
     setFullscreenSituationRoom,
     setupWizardOpen,
@@ -1631,6 +1738,10 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     updateCabinetPortfolio,
     handoverAudits,
     updateHandoverAuditItem,
+    ec8aResults,
+    submitEc8aResult,
+    verifyEc8aResult,
+    flagEc8aResult,
     metrics,
     stateSummaries,
     zoneSummaries,

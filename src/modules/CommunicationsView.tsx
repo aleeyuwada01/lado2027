@@ -1,7 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { CheckCircle2, Megaphone, Plus, Send, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, ExternalLink, Megaphone, Plus, Radio, Send, ShieldCheck } from 'lucide-react';
 import { useCampaign } from '../context/CampaignContext';
 import { NIGERIA_STATES, STATE_BY_CODE } from '../data/nigeriaGeo';
+import {
+  buildSmsRelayUrl,
+  buildWhatsAppRelayUrl,
+  sendExternalDispatch,
+  type DispatchGatewayReceipt,
+} from '../lib/dispatchGateway';
 import { canPerformAction } from '../lib/rbac';
 import type { Announcement } from '../types/campaign';
 
@@ -23,6 +29,8 @@ export const CommunicationsView: React.FC = () => {
   const [scopeFilter, setScopeFilter] = useState<string>('All');
   const [priorityFilter, setPriorityFilter] = useState<string>('All');
   const [formError, setFormError] = useState<string | null>(null);
+  const [dispatchReceipt, setDispatchReceipt] = useState<DispatchGatewayReceipt | null>(null);
+  const [isDispatching, setIsDispatching] = useState(false);
 
   const [form, setForm] = useState({
     title: '',
@@ -77,7 +85,7 @@ export const CommunicationsView: React.FC = () => {
     return Math.max(personnel.filter((p) => p.lga === form.targetValue).length, 3);
   };
 
-  const handlePublish = (e: React.FormEvent) => {
+  const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
 
@@ -99,18 +107,38 @@ export const CommunicationsView: React.FC = () => {
       return;
     }
 
+    const recipientsCount = estimateTargetCount();
+    const cleanTitle = form.title.trim();
+    const cleanBody = form.body.trim();
+
     publishAnnouncement({
-      title: form.title.trim(),
-      body: form.body.trim(),
+      title: cleanTitle,
+      body: cleanBody,
       scope: form.scope,
       targetValue: form.targetValue.trim() || form.scope,
       channels: form.channels,
       priority: form.priority,
       authorName: currentUser.displayName,
-      targetRecipients: estimateTargetCount(),
+      targetRecipients: recipientsCount,
       consentVerified: form.consentVerified,
       isDemo: false,
     });
+
+    if (form.channels.includes('SMS') || form.channels.includes('WhatsApp')) {
+      setIsDispatching(true);
+      const receipt = await sendExternalDispatch({
+        title: cleanTitle,
+        body: cleanBody,
+        channels: form.channels,
+        scope: form.scope,
+        targetValue: form.targetValue.trim() || form.scope,
+        priority: form.priority,
+        recipientsCount,
+        consentVerified: form.consentVerified,
+      });
+      setDispatchReceipt(receipt);
+      setIsDispatching(false);
+    }
 
     setForm({
       title: '',
@@ -189,9 +217,36 @@ export const CommunicationsView: React.FC = () => {
         <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
         <div>
           <strong className="text-slate-900 dark:text-white">Consent-First Dispatch Policy:</strong>{' '}
-          Internal directives are routed strictly to authorized campaign personnel, registered volunteers, and verified opt-in contacts. Unsolicited mass voter messaging and automated political profiling are disabled by policy.
+          Internal directives are routed strictly to authorized campaign personnel, registered volunteers, and verified opt-in contacts via <code>/api/dispatch</code> (Termii SMS / Meta WhatsApp Cloud) or direct operator device relay.
         </div>
       </div>
+
+      {dispatchReceipt && (
+        <div
+          className={`rounded-lg border px-4 py-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+            dispatchReceipt.delivered
+              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+              : 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-950 dark:text-amber-200'
+          }`}
+        >
+          <div className="flex items-start gap-2">
+            <Radio className="w-4 h-4 shrink-0 mt-0.5" />
+            <div>
+              <div className="font-semibold">
+                {dispatchReceipt.provider} ({dispatchReceipt.channelsAttempted.join(', ')})
+              </div>
+              <div className="mt-0.5">{dispatchReceipt.message}</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setDispatchReceipt(null)}
+            className="text-[11px] font-semibold underline shrink-0 self-end sm:self-center"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Compose Form */}
       {showCompose && (
@@ -398,10 +453,12 @@ export const CommunicationsView: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white rounded-md"
+                disabled={isDispatching}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white rounded-md disabled:opacity-60"
                 style={{ backgroundColor: branding.primaryColor }}
               >
-                <Send className="w-3.5 h-3.5" /> Publish Directive
+                <Send className="w-3.5 h-3.5" />{' '}
+                {isDispatching ? 'Dispatching...' : 'Publish Directive'}
               </button>
             </div>
           </div>
@@ -504,9 +561,29 @@ export const CommunicationsView: React.FC = () => {
                 </p>
 
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-[11px]">
-                  <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>{ann.consentVerified ? 'Opt-in consent verified' : 'Internal in-app only'}</span>
+                  <div className="flex flex-wrap items-center gap-3 text-emerald-700 dark:text-emerald-400">
+                    <span className="inline-flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>{ann.consentVerified ? 'Opt-in consent verified' : 'Internal in-app only'}</span>
+                    </span>
+                    {ann.channels.includes('WhatsApp') && (
+                      <a
+                        href={buildWhatsAppRelayUrl(ann.title, ann.body)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-700 text-[11px] font-medium hover:bg-emerald-50 dark:hover:bg-emerald-950/60"
+                      >
+                        WhatsApp Relay <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                    {ann.channels.includes('SMS') && (
+                      <a
+                        href={buildSmsRelayUrl(ann.title, ann.body)}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300 text-[11px] font-medium hover:bg-sky-50 dark:hover:bg-sky-950/60"
+                      >
+                        SMS Relay <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
                   </div>
                   <div className="flex items-center gap-3 w-full sm:w-64">
                     <span className="text-slate-500 shrink-0">Read Receipts</span>

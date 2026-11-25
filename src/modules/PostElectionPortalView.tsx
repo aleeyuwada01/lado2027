@@ -8,8 +8,10 @@ import {
   Flame,
   Landmark,
   Lightbulb,
+  Map as MapIcon,
   MapPin,
   Plus,
+  Printer,
   Rocket,
   Search,
   ShieldAlert,
@@ -18,8 +20,12 @@ import {
   Users,
 } from 'lucide-react';
 import { useCampaign } from '../context/CampaignContext';
+import { KatsinaMapboxViz } from '../components/KatsinaMapboxViz';
+import { TRANSITION_LGA_PROJECTS, TRANSITION_PROJECTS_BY_LGA_ID } from '../data/transitionProjectsSeed';
+import { createDefaultSimulationConfig, runKatsinaSimulation } from '../lib/electionSimulator';
 import { canPerformAction } from '../lib/rbac';
 import { KATSINA_INEC_LGAS, KATSINA_INEC_META } from '../data/katsinaInecData';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import {
   computeTransitionReadiness,
   exportTransitionBriefingCsv,
@@ -37,7 +43,7 @@ import type {
   TransitionSector,
 } from '../types/campaign';
 
-type PortalTab = 'day-100' | 'ideas-bank' | 'cabinet-setup' | 'handover-audit';
+type PortalTab = 'day-100' | 'ideas-bank' | 'cabinet-setup' | 'handover-audit' | 'projects-map';
 
 const PHASES: TransitionPhase[] = [
   'Pre-Inauguration Transition',
@@ -188,6 +194,20 @@ export const PostElectionPortalView: React.FC = () => {
 
   // Handover Audit notes drafts
   const [auditNotesDraft, setAuditNotesDraft] = useState<Record<string, string>>({});
+  const [selectedProjectLgaId, setSelectedProjectLgaId] = useState<string>('rimi');
+
+  const katsinaSim = useMemo(
+    () => runKatsinaSimulation(createDefaultSimulationConfig()),
+    []
+  );
+
+  const sectorChartData = useMemo(() => {
+    return SECTORS.map((sec) => ({
+      sector: sec.split('&')[0].trim(),
+      actions: transitionActions.filter((a) => a.sector === sec).length,
+      ideas: governanceIdeas.filter((i) => i.sector === sec).length,
+    }));
+  }, [transitionActions, governanceIdeas]);
 
   const readiness = useMemo(
     () =>
@@ -367,7 +387,7 @@ export const PostElectionPortalView: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 shrink-0 no-print">
             {canExport && (
               <button
                 type="button"
@@ -378,6 +398,17 @@ export const PostElectionPortalView: React.FC = () => {
                 Export Transition Briefing (CSV)
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => {
+                setTab('projects-map');
+                window.setTimeout(() => window.print(), 120);
+              }}
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 min-h-[40px] text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 hover:bg-slate-800 transition-colors whitespace-nowrap"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              Print Charter
+            </button>
             <button
               type="button"
               onClick={() => setActiveModule('voter-sentiment')}
@@ -501,6 +532,7 @@ export const PostElectionPortalView: React.FC = () => {
             { id: 'ideas-bank', label: 'Ideas & Policy Bank', icon: Lightbulb, count: governanceIdeas.length },
             { id: 'cabinet-setup', label: 'Cabinet & Agencies', icon: Users, count: cabinetPortfolios.length },
             { id: 'handover-audit', label: 'Handover Audit & LGAs', icon: ClipboardCheck, count: handoverAudits.length },
+            { id: 'projects-map', label: 'Projects Map & Print', icon: MapIcon, count: TRANSITION_LGA_PROJECTS.length },
           ] as const
         ).map((item) => {
           const Icon = item.icon;
@@ -1558,6 +1590,165 @@ export const PostElectionPortalView: React.FC = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* TAB 5: LGA TRANSITION PROJECTS MAP, SECTOR CHART & PRINTABLE EXECUTIVE CHARTER */}
+      {tab === 'projects-map' && (
+        <section className="space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+            <div className="xl:col-span-7 min-w-0">
+              <KatsinaMapboxViz
+                simulation={katsinaSim}
+                selectedLgaId={selectedProjectLgaId}
+                onSelectLga={setSelectedProjectLgaId}
+                initialVizMode="transition"
+                heightClass="h-[320px] sm:h-[420px]"
+              />
+            </div>
+
+            <div className="xl:col-span-5 space-y-4 min-w-0">
+              <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-lg p-5 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Selected LGA Anchor Projects
+                  </h3>
+                  <span className="font-mono text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                    {katsinaSim.lgaById[selectedProjectLgaId]?.lga.name || 'Katsina'} LGA
+                  </span>
+                </div>
+
+                {(TRANSITION_PROJECTS_BY_LGA_ID[selectedProjectLgaId] ?? []).length > 0 ? (
+                  <div className="space-y-3">
+                    {TRANSITION_PROJECTS_BY_LGA_ID[selectedProjectLgaId].map((pin) => (
+                      <div
+                        key={pin.id}
+                        className="p-3.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs"
+                      >
+                        <div className="flex items-center justify-between gap-2 text-[11px]">
+                          <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                            {pin.sector}
+                          </span>
+                          <span className="font-mono text-slate-500">{pin.window}</span>
+                        </div>
+                        <div className="font-bold text-slate-900 dark:text-white">{pin.title}</div>
+                        <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                          {pin.summary}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Covered under Statewide 361-Ward Free Public Wi-Fi, Free Public Tuition, and Ward PHC Solarization programs. Select Rimi, Katsina, Daura, Funtua, Batsari, Bakori, or Malumfashi for flagship capital hub details.
+                  </p>
+                )}
+
+                <div className="pt-2 flex flex-wrap gap-1.5">
+                  {['rimi', 'katsina', 'daura', 'funtua', 'bakori', 'batsari'].map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setSelectedProjectLgaId(id)}
+                      className={`px-2.5 py-1 text-[11px] font-medium rounded border capitalize ${
+                        selectedProjectLgaId === id
+                          ? 'bg-emerald-700 text-white border-emerald-600'
+                          : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                      }`}
+                    >
+                      {katsinaSim.lgaById[id]?.lga.name || id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sector Allocation Chart */}
+              <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-lg p-5 space-y-3">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Policy Pipeline by Governance Sector
+                </h3>
+                <div className="h-[200px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={sectorChartData} margin={{ top: 6, right: 8, left: -24, bottom: 0 }}>
+                      <XAxis dataKey="sector" tick={{ fontSize: 10 }} />
+                      <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="ideas" name="Policy Ideas" radius={[4, 4, 0, 0]}>
+                        {sectorChartData.map((entry, idx) => (
+                          <Cell
+                            key={entry.sector}
+                            fill={idx % 2 === 0 ? '#0D5C38' : '#0284C7'}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Printable Executive Transition Charter Sheet */}
+          <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-lg p-6 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Printable Executive Transition Brief &amp; Day-1 Directives
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Formatted A4 briefing sheet compiling active transition stage ({transitionPhase}), confirmed portfolios, and Days 1–30 orders.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="no-print inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[38px] text-xs font-semibold text-white rounded-md"
+                style={{ backgroundColor: branding.primaryColor }}
+              >
+                <Printer className="w-3.5 h-3.5" />
+                Print / Save PDF Brief
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div className="space-y-2">
+                <div className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">
+                  Priority Transition Milestones ({transitionActions.length})
+                </div>
+                <ul className="space-y-1.5">
+                  {transitionActions.slice(0, 6).map((a) => (
+                    <li key={a.id} className="border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                      <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+                        [{a.window}]
+                      </span>{' '}
+                      <span className="font-semibold text-slate-900 dark:text-white">{a.title}</span>
+                      <div className="text-[11px] text-slate-500">
+                        Lead: {a.leadOffice} · {a.status} ({a.progressPct}%)
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="space-y-2">
+                <div className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">
+                  Cabinet Portfolio Day-1 Mandates ({cabinetPortfolios.length})
+                </div>
+                <ul className="space-y-1.5">
+                  {cabinetPortfolios.slice(0, 6).map((c) => (
+                    <li key={c.id} className="border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {c.ministryName}
+                      </span>{' '}
+                      <span className="font-mono text-[10px] text-sky-700 dark:text-sky-400">
+                        ({c.vettingStatus})
+                      </span>
+                      <div className="text-[11px] text-slate-500">{c.dayOneDirective}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </section>

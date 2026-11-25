@@ -9,25 +9,31 @@ import {
   Globe,
   HeartPulse,
   Landmark,
+  Lightbulb,
   MapPin,
   Radio,
+  Rocket,
   ShieldCheck,
   GraduationCap,
   Briefcase,
   Sprout,
   TrendingUp,
+  UserPlus,
   Wifi,
   Wind,
 } from 'lucide-react';
 import { useCampaign } from '../context/CampaignContext';
 import { KATSINA_INEC_META } from '../data/katsinaInecData';
+import { NIGERIA_STATES, STATE_BY_CODE } from '../data/nigeriaGeo';
+import { t } from '../lib/i18n';
+import { computeTransitionReadiness } from '../lib/postElection';
 import { NigeriaMap } from './NigeriaMap';
 import { LandingSimulationSnippet } from './LandingSimulationSnippet';
 import {
   createDefaultSimulationConfig,
   runKatsinaSimulation,
 } from '../lib/electionSimulator';
-import type { NavModuleId } from '../types/campaign';
+import type { NavModuleId, RoleName, TransitionSector } from '../types/campaign';
 
 interface LandingPageProps {
   onEnterCommand: (
@@ -153,10 +159,102 @@ const PUBLIC_SERVICE_RECORD = [
 ];
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
-  const { branding, stateSummaries, selectedStateCode, setSelectedStateCode, metrics } =
-    useCampaign();
+  const {
+    branding,
+    stateSummaries,
+    selectedStateCode,
+    setSelectedStateCode,
+    metrics,
+    language,
+    toggleLanguage,
+    addPersonnel,
+    submitGovernanceIdea,
+    transitionActions,
+    governanceIdeas,
+    cabinetPortfolios,
+    handoverAudits,
+  } = useCampaign();
   const [mapLayer, setMapLayer] = useState<'coverage' | 'incidents' | 'reports'>('coverage');
   const [agendaCategory, setAgendaCategory] = useState<'All' | AgendaCategory>('All');
+
+  // Public Grassroots Volunteer Form State
+  const [volName, setVolName] = useState('');
+  const [volPhone, setVolPhone] = useState('');
+  const [volTrack, setVolTrack] = useState<RoleName>('Volunteer');
+  const [volState, setVolState] = useState('KT');
+  const [volLga, setVolLga] = useState('Katsina');
+  const [volWard, setVolWard] = useState('');
+  const [volReceipt, setVolReceipt] = useState<string | null>(null);
+
+  // Public Citizen Governance Idea Form State
+  const [citTitle, setCitTitle] = useState('');
+  const [citSector, setCitSector] = useState<TransitionSector>('AI, Digital & Free Internet');
+  const [citZone, setCitZone] = useState<
+    'Statewide' | 'Katsina Central' | 'Daura (Katsina North)' | 'Funtua (Katsina South)'
+  >('Statewide');
+  const [citSummary, setCitSummary] = useState('');
+  const [citReceipt, setCitReceipt] = useState<string | null>(null);
+
+  const transitionReadiness = useMemo(
+    () =>
+      computeTransitionReadiness({
+        actions: transitionActions,
+        ideas: governanceIdeas,
+        cabinet: cabinetPortfolios,
+        audits: handoverAudits,
+      }),
+    [transitionActions, governanceIdeas, cabinetPortfolios, handoverAudits]
+  );
+
+  const volStateLgas = STATE_BY_CODE[volState]?.lgas ?? [];
+
+  const handlePublicVolunteerSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!volName.trim() || !volPhone.trim()) return;
+    addPersonnel({
+      fullName: volName.trim(),
+      role: volTrack,
+      orgLevel: volTrack === 'Polling Unit Agent' ? 'Polling Unit' : 'Ward',
+      department: volTrack === 'Polling Unit Agent' ? 'Field Operations' : 'Events & Mobilization',
+      stateCode: volState,
+      lga: volLga || volStateLgas[0] || 'Katsina',
+      ward: volWard.trim() || 'Central Ward',
+      supervisor: 'Grassroots Onboarding Desk',
+      phone: volPhone.trim(),
+      status: 'Active',
+      trainingStatus: 'Scheduled',
+      checkedIn: false,
+      isVolunteer: volTrack === 'Volunteer',
+      isFieldAgent: volTrack === 'Polling Unit Agent' || volTrack === 'Field Supervisor',
+      isDemo: false,
+    });
+    const receiptCode = `YLDM-${volState}-${Date.now().toString().slice(-4)}`;
+    setVolReceipt(
+      `Registered ${volName.trim()} (${volTrack}) in ${volLga}, ${volState}. Ref: ${receiptCode}`
+    );
+    setVolName('');
+    setVolPhone('');
+    setVolWard('');
+  };
+
+  const handlePublicIdeaSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!citTitle.trim() || !citSummary.trim()) return;
+    submitGovernanceIdea({
+      title: citTitle.trim(),
+      sector: citSector,
+      zone: citZone,
+      summary: citSummary.trim(),
+      executionPlan: `Citizen submission routed to ${citSector} transition panel for ${citZone} review and 100-day feasibility assessment.`,
+      estimatedTimeline: 'Days 31–60',
+      budgetTier: 'Medium Capital',
+      submittedBy: 'Public Citizen Intake Portal',
+      isDemo: false,
+    });
+    setCitReceipt(`Idea "${citTitle.trim()}" added to the Post-Election Ideas Bank!`);
+    setCitTitle('');
+    setCitSummary('');
+  };
 
   const filteredAgendaPillars = useMemo(
     () =>
@@ -232,10 +330,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
             </span>
           </a>
 
-          {/* Zone 2: 4 Clean Single-Line Text Navigation Links */}
+          {/* Zone 2: Clean Single-Line Text Navigation Links (xl+) */}
           <nav
             aria-label="Campaign Landing Navigation"
-            className="hidden md:flex items-center md:gap-4 lg:gap-6 text-xs lg:text-sm font-medium text-slate-600 shrink-0"
+            className="hidden xl:flex items-center gap-5 text-xs xl:text-sm font-medium text-slate-600 shrink-0"
           >
             <a
               href="#victory-simulation"
@@ -253,13 +351,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
               href="#agenda"
               className="hover:text-slate-950 transition-colors whitespace-nowrap shrink-0"
             >
-              Agenda
+              {t(language, 'navAgenda')}
+            </a>
+            <a
+              href="#citizen-desk"
+              className="hover:text-slate-950 transition-colors whitespace-nowrap shrink-0"
+            >
+              {t(language, 'navCitizenDesk')}
             </a>
             <a
               href="#operations-map"
               className="hover:text-slate-950 transition-colors whitespace-nowrap shrink-0"
             >
-              Operations Map
+              {t(language, 'navMap')}
             </a>
             <button
               type="button"
@@ -267,7 +371,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
               data-testid="landing-post-election-nav"
               className="hover:text-slate-950 transition-colors whitespace-nowrap shrink-0"
             >
-              Transition Portal
+              {t(language, 'navTransition')}
             </button>
             <button
               type="button"
@@ -288,25 +392,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
             </button>
           </nav>
 
-          {/* Zone 3: 1 Primary Action */}
-          <div className="shrink-0">
+          {/* Zone 3: Language Switcher + Primary Action */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              aria-label={`Switch language (current: ${language === 'en' ? 'English' : 'Hausa'})`}
+              className="px-2.5 py-2 min-h-[40px] text-[11px] font-mono font-bold rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors whitespace-nowrap"
+            >
+              {language === 'en' ? 'EN / HA' : 'HA / EN'}
+            </button>
             <button
               type="button"
               onClick={() => onEnterCommand('situation-room')}
               className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-4 min-h-[40px] text-xs font-semibold text-white rounded-lg transition-opacity hover:opacity-92 whitespace-nowrap shrink-0"
               style={{ backgroundColor: branding.primaryColor }}
             >
-              <span className="sm:hidden">Situation Room</span>
-              <span className="hidden sm:inline">Enter Situation Room</span>
+              <span className="sm:hidden">{t(language, 'enterSituationShort')}</span>
+              <span className="hidden sm:inline">{t(language, 'enterSituationRoom')}</span>
               <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
           </div>
         </div>
 
-        {/* Mobile Quick-Jump Strip (<md) */}
+        {/* Mobile & Tablet Quick-Jump Strip (<xl) */}
         <nav
           aria-label="Mobile Quick Navigation"
-          className="md:hidden border-t border-slate-100 bg-white/95 px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-medium text-slate-600"
+          className="xl:hidden border-t border-slate-100 bg-white/95 px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-medium text-slate-600"
         >
           <a
             href="#victory-simulation"
@@ -319,6 +431,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
             className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center rounded-lg bg-slate-100/90 text-slate-800 whitespace-nowrap shrink-0"
           >
             8-Point Agenda
+          </a>
+          <a
+            href="#citizen-desk"
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center rounded-lg bg-slate-100/90 text-slate-800 whitespace-nowrap shrink-0"
+          >
+            {t(language, 'navCitizenDesk')}
           </a>
           <a
             href="#leadership"
@@ -377,14 +495,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
                       {branding.partyAffiliation}
                     </span>
                     <span className="hidden sm:inline text-slate-300" aria-hidden="true">·</span>
-                    <span>Katsina State 2027 Victory Command</span>
+                    <span>{t(language, 'brandSubtitle')}</span>
                   </div>
 
                   <h1
                     className="font-display font-bold tracking-tight text-slate-950 leading-[1.08]"
                     style={{ fontSize: 'clamp(1.85rem, 3.5vw, 3.1rem)' }}
                   >
-                    Welcome — See How Senator Yakubu Lado Wins Katsina State.
+                    {t(language, 'heroHeadline')}
                   </h1>
 
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl">
@@ -864,6 +982,239 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Public Grassroots Volunteer Sign-Up, Citizen Idea Submission & 100-Day Promise Meter */}
+        <section id="citizen-desk" className="bg-[#F8F9FA] border-b border-slate-200/80 py-14 lg:py-20">
+          <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 space-y-8">
+            <div className="max-w-3xl space-y-2">
+              <div className="text-xs font-semibold text-emerald-800">
+                {t(language, 'citizenDeskEyebrow')}
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold font-display tracking-tight text-slate-950">
+                {t(language, 'citizenDeskTitle')}
+              </h2>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                {t(language, 'citizenDeskDesc')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+              {/* Volunteer & Grassroots Mobilizer Intake */}
+              <form
+                onSubmit={handlePublicVolunteerSubmit}
+                className="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-5 space-y-3.5 flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
+                    <UserPlus className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <span>{t(language, 'volunteerFormTitle')}</span>
+                  </div>
+
+                  <input
+                    required
+                    type="text"
+                    value={volName}
+                    onChange={(e) => setVolName(e.target.value)}
+                    placeholder="Full Name..."
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <input
+                      required
+                      type="tel"
+                      value={volPhone}
+                      onChange={(e) => setVolPhone(e.target.value)}
+                      placeholder="Phone (+234...)"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                    />
+                    <select
+                      aria-label="Volunteer track"
+                      value={volTrack}
+                      onChange={(e) => setVolTrack(e.target.value as RoleName)}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                    >
+                      <option value="Volunteer">Community Volunteer</option>
+                      <option value="Polling Unit Agent">Polling Unit Agent</option>
+                      <option value="Field Supervisor">Ward Mobilizer</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <select
+                      aria-label="Volunteer state"
+                      value={volState}
+                      onChange={(e) => {
+                        const code = e.target.value;
+                        setVolState(code);
+                        setVolLga(STATE_BY_CODE[code]?.lgas[0] || '');
+                      }}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                    >
+                      {NIGERIA_STATES.map((st) => (
+                        <option key={st.code} value={st.code}>
+                          {st.name}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      aria-label="Volunteer LGA"
+                      value={volLga}
+                      onChange={(e) => setVolLga(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                    >
+                      {volStateLgas.map((l) => (
+                        <option key={l} value={l}>
+                          {l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    type="text"
+                    value={volWard}
+                    onChange={(e) => setVolWard(e.target.value)}
+                    placeholder="Ward name (optional)..."
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                  />
+
+                  {volReceipt && (
+                    <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800">
+                      {volReceipt}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 min-h-[42px] text-xs font-semibold text-white rounded-lg"
+                  style={{ backgroundColor: branding.primaryColor }}
+                >
+                  {t(language, 'volunteerFormBtn')}
+                </button>
+              </form>
+
+              {/* Public Citizen Idea Submission */}
+              <form
+                onSubmit={handlePublicIdeaSubmit}
+                className="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-5 space-y-3.5 flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-bold text-slate-950">
+                    <Lightbulb className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>{t(language, 'ideaFormTitle')}</span>
+                  </div>
+
+                  <input
+                    required
+                    type="text"
+                    value={citTitle}
+                    onChange={(e) => setCitTitle(e.target.value)}
+                    placeholder="Idea headline (e.g. Solar clinic upgrade for Mani ward)..."
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <select
+                      aria-label="Citizen idea sector"
+                      value={citSector}
+                      onChange={(e) => setCitSector(e.target.value as TransitionSector)}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                    >
+                      <option value="Security & Peace">Security &amp; Peace</option>
+                      <option value="Clean Energy & Rimi Wind">Clean Energy &amp; Rimi Wind</option>
+                      <option value="AI, Digital & Free Internet">AI, Digital &amp; Free Wi-Fi</option>
+                      <option value="Education & STEM">Education &amp; STEM</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Agriculture & Economy">Agriculture &amp; Economy</option>
+                      <option value="Governance & Civil Service">Governance &amp; Civil Service</option>
+                    </select>
+                    <select
+                      aria-label="Citizen idea zone"
+                      value={citZone}
+                      onChange={(e) =>
+                        setCitZone(
+                          e.target.value as
+                            | 'Statewide'
+                            | 'Katsina Central'
+                            | 'Daura (Katsina North)'
+                            | 'Funtua (Katsina South)'
+                        )
+                      }
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                    >
+                      <option value="Statewide">Statewide</option>
+                      <option value="Katsina Central">Katsina Central</option>
+                      <option value="Daura (Katsina North)">Daura (North)</option>
+                      <option value="Funtua (Katsina South)">Funtua (South)</option>
+                    </select>
+                  </div>
+                  <textarea
+                    required
+                    rows={3}
+                    value={citSummary}
+                    onChange={(e) => setCitSummary(e.target.value)}
+                    placeholder="Describe the community challenge and how government should deliver it..."
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50"
+                  />
+
+                  {citReceipt && (
+                    <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800">
+                      {citReceipt}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 min-h-[42px] text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg"
+                >
+                  {t(language, 'ideaFormBtn')}
+                </button>
+              </form>
+
+              {/* Public Read-Only 100-Day Promise & Transition Delivery Meter */}
+              <div className="lg:col-span-4 bg-[#0A0F1A] text-white border border-slate-800 rounded-2xl p-5 flex flex-col justify-between gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-sm font-bold text-white">
+                      <Rocket className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>{t(language, 'promiseTrackerTitle')}</span>
+                    </div>
+                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                      {transitionReadiness.overallReadinessScore}/100
+                    </span>
+                  </div>
+
+                  <div className="space-y-2.5 pt-1">
+                    {transitionActions.slice(0, 4).map((act) => (
+                      <div key={act.id} className="space-y-1 text-xs">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="truncate font-medium text-slate-200">{act.title}</span>
+                          <span className="font-mono text-[11px] text-emerald-400 shrink-0">
+                            {act.progressPct}%
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-500"
+                            style={{ width: `${act.progressPct}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onEnterCommand('post-election')}
+                  className="w-full inline-flex items-center justify-center gap-2 py-2.5 min-h-[42px] text-xs font-semibold rounded-lg bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition-colors"
+                >
+                  <Landmark className="w-4 h-4" />
+                  Open Full Post-Election Portal ({governanceIdeas.length} Plans)
+                </button>
               </div>
             </div>
           </div>

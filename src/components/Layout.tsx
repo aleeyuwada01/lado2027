@@ -98,6 +98,8 @@ export const Layout: React.FC<LayoutProps> = ({
     activeModule,
     setActiveModule,
     branding,
+    language,
+    toggleLanguage,
     darkMode,
     toggleDarkMode,
     fullscreenSituationRoom,
@@ -493,6 +495,16 @@ export const Layout: React.FC<LayoutProps> = ({
                 Search states, LGAs...
               </span>
               <span className="hidden sm:inline font-mono text-[10px] text-slate-400">Ctrl K</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              aria-label={`Switch interface language (current: ${language === 'en' ? 'English' : 'Hausa'})`}
+              title="Switch English / Hausa"
+              className="inline-flex items-center justify-center px-2 sm:px-2.5 py-1.5 min-h-[36px] text-[11px] font-mono font-bold rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap"
+            >
+              {language === 'en' ? 'EN / HA' : 'HA / EN'}
             </button>
 
             <button

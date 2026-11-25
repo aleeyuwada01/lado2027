@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   CheckCircle2,
   CloudOff,
   CloudUpload,
   MapPin,
   Monitor,
+  ShieldCheck,
   Smartphone,
   Wifi,
   WifiOff,
 } from 'lucide-react';
 import { useCampaign } from '../context/CampaignContext';
 import { NIGERIA_STATES, STATE_BY_CODE } from '../data/nigeriaGeo';
+import { t } from '../lib/i18n';
 import type { FieldCheckIn, FieldReport } from '../types/campaign';
 
 export const FieldOpsView: React.FC = () => {
@@ -26,9 +28,28 @@ export const FieldOpsView: React.FC = () => {
     offlineQueue,
     syncOfflineQueue,
     currentUser,
+    language,
   } = useCampaign();
 
   const [mobilePreviewMode, setMobilePreviewMode] = useState(false);
+  const [swReady, setSwReady] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .getRegistration()
+        .then((reg) => setSwReady(Boolean(reg)))
+        .catch(() => undefined);
+    }
+    const handleOffline = () => setIsOfflineMode(true);
+    const handleOnline = () => setIsOfflineMode(false);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [setIsOfflineMode]);
 
   // Check-In Form State
   const fieldAgents = personnel.filter((p) => p.isFieldAgent || p.role.includes('Coordinator'));
@@ -139,11 +160,17 @@ export const FieldOpsView: React.FC = () => {
       {/* Header & Offline/Mobile Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Field Operations & Mobile PWA Console
-          </h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              {t(language, 'fieldOpsTitle')}
+            </h2>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              <ShieldCheck className="w-3 h-3" />
+              {swReady ? 'PWA Cache Active' : 'Offline Sync Ready'}
+            </span>
+          </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Permission-disclosed field check-ins, offline-first reporting queue, and real-time operational dispatch.
+            {t(language, 'fieldOpsSubtitle')}
           </p>
         </div>
 
@@ -158,7 +185,7 @@ export const FieldOpsView: React.FC = () => {
             }`}
           >
             {isOfflineMode ? <WifiOff className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5" />}
-            {isOfflineMode ? 'Offline Field Simulation: ON' : 'Connection: Online'}
+            {isOfflineMode ? t(language, 'fieldOfflineOn') : t(language, 'fieldOfflineOff')}
           </button>
 
           {offlineQueue.length > 0 && (
@@ -217,7 +244,9 @@ export const FieldOpsView: React.FC = () => {
           className={`${mobilePreviewMode ? '' : 'lg:col-span-5'} bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-md p-5 space-y-3.5`}
         >
           <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Field Personnel Check-In</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              {t(language, 'fieldCheckInHeading')}
+            </h3>
             <p className="text-[11px] text-slate-500 mt-0.5">
               Location sharing is strictly opt-in, disclosed, and limited to operational coordination.
             </p>
@@ -346,7 +375,7 @@ export const FieldOpsView: React.FC = () => {
             className="w-full py-2.5 text-xs font-semibold text-white rounded-md"
             style={{ backgroundColor: branding.primaryColor }}
           >
-            Submit Field Check-In
+            {t(language, 'fieldSubmitCheckIn')}
           </button>
         </form>
 

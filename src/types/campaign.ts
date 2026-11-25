@@ -623,3 +623,44 @@ export interface HandoverAuditItem {
   updatedAt: string;
   isDemo?: boolean;
 }
+
+
+export type AppLanguage = 'en' | 'ha';
+
+export type Ec8aResultStatus = 'Submitted' | 'Verified' | 'Discrepancy Flagged';
+
+export interface Ec8aResultRecord {
+  id: string;
+  refCode: string;
+  stateCode: string;
+  lgaId: string;
+  lgaName: string;
+  wardName: string;
+  pollingUnitCode: string;
+  pollingUnitName: string;
+  accreditedVoters: number;
+  pdpVotes: number;
+  apcVotes: number;
+  adcVotes: number;
+  otherVotes: number;
+  rejectedVotes: number;
+  sheetPhotoRef: string;
+  submittedBy: string;
+  verifiedBy?: string;
+  flagReason?: string;
+  status: Ec8aResultStatus;
+  submittedAt: string;
+  isDemo?: boolean;
+}
+
+export interface TransitionProjectPin {
+  id: string;
+  lgaId: string;
+  lgaName: string;
+  zone: 'Katsina Central' | 'Katsina North' | 'Katsina South';
+  title: string;
+  sector: TransitionSector;
+  window: TransitionDayWindow;
+  budgetEst: string;
+  summary: string;
+}

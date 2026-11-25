@@ -70,7 +70,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|src/assets/|manifest\\.webmanifest|favicon\\.svg|og-lado\\.jpg|robots\\.txt).*)",
+      "source": "/((?!api/|assets/|src/assets/|manifest\\.webmanifest|sw\\.js|favicon\\.ico|favicon\\.svg|og-lado\\.jpg|robots\\.txt).*)",
       "destination": "/index.html"
     }
   ],
@@ -112,6 +112,19 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     },

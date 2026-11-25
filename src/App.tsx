@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CampaignProvider, useCampaign } from './context/CampaignContext';
 import { LandingPage } from './components/LandingPage';
@@ -70,28 +70,72 @@ function resolveRouteFromLocation(): {
   return { showLanding: true, initialModule: 'situation-room', openSentiment };
 }
 
-import { SituationRoomView } from './modules/SituationRoomView';
-import { KatsinaSimulatorView } from './modules/KatsinaSimulatorView';
-import { VoterSentimentView } from './modules/VoterSentimentView';
-import { PostElectionPortalView } from './modules/PostElectionPortalView';
-import { CampaignOverviewView } from './modules/CampaignOverviewView';
-import { GeographicOpsView } from './modules/GeographicOpsView';
-import { FieldOpsView } from './modules/FieldOpsView';
-import { AgentsVolunteersView } from './modules/AgentsVolunteersView';
-import { CallCenterView } from './modules/CallCenterView';
-import { IncidentsView } from './modules/IncidentsView';
-import { EventsView } from './modules/EventsView';
-import { LogisticsView } from './modules/LogisticsView';
-import { OrganizationView } from './modules/OrganizationView';
-import { PollingCoverageView } from './modules/PollingCoverageView';
-import { ElectionDayView } from './modules/ElectionDayView';
-import { ReportsAnalyticsView } from './modules/ReportsAnalyticsView';
-import { CommunicationsView } from './modules/CommunicationsView';
-import { MediaMonitoringView } from './modules/MediaMonitoringView';
-import { DocumentsView } from './modules/DocumentsView';
-import { TasksView } from './modules/TasksView';
-import { SecurityAuditView } from './modules/SecurityAuditView';
-import { SettingsAdminView } from './modules/SettingsAdminView';
+const SituationRoomView = lazy(() =>
+  import('./modules/SituationRoomView').then((m) => ({ default: m.SituationRoomView }))
+);
+const KatsinaSimulatorView = lazy(() =>
+  import('./modules/KatsinaSimulatorView').then((m) => ({ default: m.KatsinaSimulatorView }))
+);
+const VoterSentimentView = lazy(() =>
+  import('./modules/VoterSentimentView').then((m) => ({ default: m.VoterSentimentView }))
+);
+const PostElectionPortalView = lazy(() =>
+  import('./modules/PostElectionPortalView').then((m) => ({ default: m.PostElectionPortalView }))
+);
+const CampaignOverviewView = lazy(() =>
+  import('./modules/CampaignOverviewView').then((m) => ({ default: m.CampaignOverviewView }))
+);
+const GeographicOpsView = lazy(() =>
+  import('./modules/GeographicOpsView').then((m) => ({ default: m.GeographicOpsView }))
+);
+const FieldOpsView = lazy(() =>
+  import('./modules/FieldOpsView').then((m) => ({ default: m.FieldOpsView }))
+);
+const AgentsVolunteersView = lazy(() =>
+  import('./modules/AgentsVolunteersView').then((m) => ({ default: m.AgentsVolunteersView }))
+);
+const CallCenterView = lazy(() =>
+  import('./modules/CallCenterView').then((m) => ({ default: m.CallCenterView }))
+);
+const IncidentsView = lazy(() =>
+  import('./modules/IncidentsView').then((m) => ({ default: m.IncidentsView }))
+);
+const EventsView = lazy(() =>
+  import('./modules/EventsView').then((m) => ({ default: m.EventsView }))
+);
+const LogisticsView = lazy(() =>
+  import('./modules/LogisticsView').then((m) => ({ default: m.LogisticsView }))
+);
+const OrganizationView = lazy(() =>
+  import('./modules/OrganizationView').then((m) => ({ default: m.OrganizationView }))
+);
+const PollingCoverageView = lazy(() =>
+  import('./modules/PollingCoverageView').then((m) => ({ default: m.PollingCoverageView }))
+);
+const ElectionDayView = lazy(() =>
+  import('./modules/ElectionDayView').then((m) => ({ default: m.ElectionDayView }))
+);
+const ReportsAnalyticsView = lazy(() =>
+  import('./modules/ReportsAnalyticsView').then((m) => ({ default: m.ReportsAnalyticsView }))
+);
+const CommunicationsView = lazy(() =>
+  import('./modules/CommunicationsView').then((m) => ({ default: m.CommunicationsView }))
+);
+const MediaMonitoringView = lazy(() =>
+  import('./modules/MediaMonitoringView').then((m) => ({ default: m.MediaMonitoringView }))
+);
+const DocumentsView = lazy(() =>
+  import('./modules/DocumentsView').then((m) => ({ default: m.DocumentsView }))
+);
+const TasksView = lazy(() =>
+  import('./modules/TasksView').then((m) => ({ default: m.TasksView }))
+);
+const SecurityAuditView = lazy(() =>
+  import('./modules/SecurityAuditView').then((m) => ({ default: m.SecurityAuditView }))
+);
+const SettingsAdminView = lazy(() =>
+  import('./modules/SettingsAdminView').then((m) => ({ default: m.SettingsAdminView }))
+);
 
 const MODULE_TRANSITION_LABELS: Partial<Record<NavModuleId, string>> = {
   'situation-room': 'Entering Executive Situation Room...',
@@ -321,7 +365,15 @@ const CampaignAppShell: React.FC = () => {
             onReturnHome={handleReturnHome}
             initialSentimentOpen={openSentimentOnEnter}
           >
-            <ActiveModuleSwitch />
+            <Suspense
+              fallback={
+                <div className="py-20 text-center text-xs font-medium text-slate-500">
+                  Loading workspace module...
+                </div>
+              }
+            >
+              <ActiveModuleSwitch />
+            </Suspense>
           </Layout>
           <CommandSearchModal />
           <SetupWizardModal />

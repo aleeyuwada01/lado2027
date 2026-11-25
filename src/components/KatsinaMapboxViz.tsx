@@ -11,17 +11,19 @@ import {
   type LgaSimulationResult,
 } from '../lib/electionSimulator';
 import type { KatsinaSenatorialZone } from '../data/katsinaInecData';
+import { TRANSITION_PROJECTS_BY_LGA_ID } from '../data/transitionProjectsSeed';
 import { CampaignLoader } from './CampaignLoader';
 
 maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
-export type KatsinaVizMode = 'simulation' | 'density' | 'wards' | 'reach';
+export type KatsinaVizMode = 'simulation' | 'density' | 'wards' | 'reach' | 'transition';
 
 interface KatsinaMapboxVizProps {
   simulation: KatsinaSimulationOutput;
   selectedLgaId: string;
   onSelectLga: (lgaId: string) => void;
   heightClass?: string;
+  initialVizMode?: KatsinaVizMode;
 }
 
 const KATSINA_CENTER: [number, number] = [7.72, 12.24];
@@ -154,6 +156,21 @@ function getLgaVisualAccent(
     if (item.wardCapturePct >= 65) return { fill: '#15803D', border: '#86EFAC' };
     return { fill: '#B45309', border: '#FCD34D' };
   }
+  if (mode === 'transition') {
+    const pins = TRANSITION_PROJECTS_BY_LGA_ID[item.lga.id] ?? [];
+    if (
+      pins.some(
+        (p) =>
+          p.sector === 'Clean Energy & Rimi Wind' || p.sector === 'AI, Digital & Free Internet'
+      )
+    ) {
+      return { fill: '#0284C7', border: '#7DD3FC' };
+    }
+    if (pins.length > 0) {
+      return { fill: '#0D5C38', border: '#6EE7B7' };
+    }
+    return { fill: '#334155', border: '#94A3B8' };
+  }
   const remainingWards = item.lga.wardCount - item.pdpWardsWon;
   if (remainingWards >= 3 && item.lga.registeredVoters >= 95000) {
     return { fill: '#B91C1C', border: '#FCA5A5' };
@@ -169,6 +186,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
   selectedLgaId,
   onSelectLga,
   heightClass = 'h-[360px] sm:h-[460px] xl:h-[540px]',
+  initialVizMode = 'simulation',
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -179,7 +197,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
   const onSelectRef = useRef(onSelectLga);
   onSelectRef.current = onSelectLga;
 
-  const [vizMode, setVizMode] = useState<KatsinaVizMode>('simulation');
+  const [vizMode, setVizMode] = useState<KatsinaVizMode>(initialVizMode);
   const [zoneFilter, setZoneFilter] = useState<'ALL' | KatsinaSenatorialZone>('ALL');
   const [showHeatmap, setShowHeatmap] = useState<boolean>(true);
   const [showTerritories, setShowTerritories] = useState<boolean>(true);
@@ -731,6 +749,13 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
             <span className="text-slate-400">OTH {activeLga.othersSharePct}%</span>
           </div>
         </div>
+        {vizMode === 'transition' && (
+          <div className="mt-2 pt-2 border-t border-slate-800 text-[10px] text-sky-300">
+            {(TRANSITION_PROJECTS_BY_LGA_ID[activeLga.lga.id]?.length ?? 0) > 0
+              ? TRANSITION_PROJECTS_BY_LGA_ID[activeLga.lga.id][0].title
+              : 'Statewide 361-Ward Services & Public Wi-Fi Rollout'}
+          </div>
+        )}
       </>
     );
   };
@@ -752,6 +777,7 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
                 ['density', 'Density'],
                 ['wards', 'Wards'],
                 ['reach', 'Swing'],
+                ['transition', 'Projects'],
               ] as const
             ).map(([key, label]) => (
               <button
@@ -1001,6 +1027,22 @@ export const KatsinaMapboxViz: React.FC<KatsinaMapboxVizProps> = ({
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#0D5C38]" />
                 Consolidated Base
+              </span>
+            </>
+          )}
+          {vizMode === 'transition' && (
+            <>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#0284C7]" />
+                Rimi Wind / AI / Free Wi-Fi Hub
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#0D5C38]" />
+                Zonal Hospital / Peace / Agro Anchor
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#334155]" />
+                Ward-Level Baseline Allocation
               </span>
             </>
           )}
