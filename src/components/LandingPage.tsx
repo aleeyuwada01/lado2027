@@ -479,7 +479,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
 
       <main id="top">
         {/* Giant Real-Time Election Countdown to Victory (Feb 6, 2027 Governorship / Jan 16, 2027 Presidential) */}
-        <ElectionCountdownBanner language={language} />
+        <ElectionCountdownBanner
+          language={language}
+          portraitUrl={portraitSrc}
+          pdpLogoUrl={pdpLogoSrc}
+          candidateName={branding.candidateName}
+          partyName={branding.partyAffiliation}
+        />
 
         {/* Welcome Editorial Hero + Live "Lado Wins Katsina" LGA-Capture Simulation Above the Fold */}
         <section className="bg-white border-b border-slate-200/80">
