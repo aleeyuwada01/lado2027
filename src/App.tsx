@@ -12,6 +12,7 @@ const VALID_MODULE_IDS = new Set<NavModuleId>([
   'situation-room',
   'katsina-simulator',
   'voter-sentiment',
+  'post-election',
   'campaign-overview',
   'geographic-ops',
   'field-ops',
@@ -72,6 +73,7 @@ function resolveRouteFromLocation(): {
 import { SituationRoomView } from './modules/SituationRoomView';
 import { KatsinaSimulatorView } from './modules/KatsinaSimulatorView';
 import { VoterSentimentView } from './modules/VoterSentimentView';
+import { PostElectionPortalView } from './modules/PostElectionPortalView';
 import { CampaignOverviewView } from './modules/CampaignOverviewView';
 import { GeographicOpsView } from './modules/GeographicOpsView';
 import { FieldOpsView } from './modules/FieldOpsView';
@@ -95,6 +97,7 @@ const MODULE_TRANSITION_LABELS: Partial<Record<NavModuleId, string>> = {
   'situation-room': 'Entering Executive Situation Room...',
   'katsina-simulator': 'Loading Katsina 34-LGA INEC Simulator...',
   'voter-sentiment': 'Opening Live Voter Sentiment Hub...',
+  'post-election': 'Opening Post-Election Governance & Transition Portal...',
   'settings-admin': 'Opening States, LGAs & Wards Directory...',
   'geographic-ops': 'Loading 774-LGA Geographic Operations...',
   'field-ops': 'Launching Field Operations Mobile PWA...',
@@ -110,6 +113,8 @@ const ActiveModuleSwitch: React.FC = () => {
       return <KatsinaSimulatorView />;
     case 'voter-sentiment':
       return <VoterSentimentView />;
+    case 'post-election':
+      return <PostElectionPortalView />;
     case 'campaign-overview':
       return <CampaignOverviewView />;
     case 'geographic-ops':

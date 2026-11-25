@@ -8,6 +8,7 @@ import {
   Cpu,
   Globe,
   HeartPulse,
+  Landmark,
   MapPin,
   Radio,
   ShieldCheck,
@@ -234,7 +235,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
           {/* Zone 2: 4 Clean Single-Line Text Navigation Links */}
           <nav
             aria-label="Campaign Landing Navigation"
-            className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 shrink-0"
+            className="hidden md:flex items-center md:gap-4 lg:gap-6 text-xs lg:text-sm font-medium text-slate-600 shrink-0"
           >
             <a
               href="#victory-simulation"
@@ -260,6 +261,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
             >
               Operations Map
             </a>
+            <button
+              type="button"
+              onClick={() => onEnterCommand('post-election')}
+              data-testid="landing-post-election-nav"
+              className="hover:text-slate-950 transition-colors whitespace-nowrap shrink-0"
+            >
+              Transition Portal
+            </button>
             <button
               type="button"
               onClick={() => onEnterCommand('settings-admin')}
@@ -323,6 +332,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
           >
             Map
           </a>
+          <button
+            type="button"
+            onClick={() => onEnterCommand('post-election')}
+            className="px-2.5 py-1.5 min-h-[34px] inline-flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-semibold whitespace-nowrap shrink-0"
+          >
+            <Landmark className="w-3.5 h-3.5 text-amber-700" />
+            Transition Portal
+          </button>
           <button
             type="button"
             onClick={() => onEnterCommand('settings-admin')}
@@ -791,6 +808,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
                       </div>
                     </div>
                   </div>
+
+                  <div className="pt-3 border-t border-slate-800/90">
+                    <button
+                      type="button"
+                      onClick={() => onEnterCommand('post-election')}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[42px] text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition-colors"
+                    >
+                      <Landmark className="w-4 h-4 shrink-0" />
+                      Open Post-Election Governance &amp; 100-Day Portal
+                      <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -914,7 +943,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
                 <span className="font-mono text-emerald-400">{metrics.agentsCheckedIn}</span>{' '}
                 checked-in field agents, and{' '}
                 <span className="font-mono text-white">{metrics.pollingUnitsTotal}</span> monitored
-                units across 21 integrated operational modules.
+                units across 22 integrated operational &amp; governance modules.
               </p>
             </div>
 
@@ -927,6 +956,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
               >
                 Enter Situation Room
                 <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onEnterCommand('post-election')}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 min-h-[44px] text-sm font-medium text-emerald-300 border border-emerald-700/70 bg-emerald-950/50 rounded-lg hover:bg-emerald-900/50 transition-colors whitespace-nowrap"
+              >
+                <Landmark className="w-4 h-4 shrink-0" />
+                Post-Election Portal
               </button>
               <button
                 type="button"
@@ -968,6 +1005,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
               className="hover:text-slate-900 transition-colors py-1"
             >
               Katsina Simulator
+            </button>
+            <button
+              type="button"
+              onClick={() => onEnterCommand('post-election')}
+              className="hover:text-slate-900 transition-colors py-1"
+            >
+              Transition Portal
             </button>
             <button
               type="button"

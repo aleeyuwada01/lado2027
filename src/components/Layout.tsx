@@ -15,6 +15,7 @@ import {
   FileText,
   Globe,
   Headphones,
+  Landmark,
   LogIn,
   MapPin,
   Megaphone,
@@ -51,6 +52,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'situation-room', label: 'Executive Situation Room', shortLabel: 'Situation Room', icon: Radio, group: 'Command' },
   { id: 'katsina-simulator', label: 'Katsina INEC & Simulator', shortLabel: 'Katsina Simulator', icon: TrendingUp, group: 'Command' },
   { id: 'voter-sentiment', label: 'Voter Sentiment Hub', shortLabel: 'Voter Sentiment', icon: Activity, group: 'Command' },
+  { id: 'post-election', label: 'Post-Election Governance Portal', shortLabel: 'Transition Portal', icon: Landmark, group: 'Transition & Govt' },
   { id: 'campaign-overview', label: 'Campaign Overview', shortLabel: 'Campaign Overview', icon: Compass, group: 'Command' },
   { id: 'geographic-ops', label: 'Geographic Operations', shortLabel: 'Geographic Ops', icon: Globe, group: 'Geography & Field' },
   { id: 'field-ops', label: 'Field Operations', shortLabel: 'Field Operations', icon: Smartphone, group: 'Geography & Field' },
@@ -266,6 +268,32 @@ export const Layout: React.FC<LayoutProps> = ({
           {(!sidebarCollapsed || isMobile) && (
             <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 shrink-0">
               34 KT
+            </span>
+          )}
+        </button>
+
+        {/* Direct Sidebar Launcher for Post-Election Transition & Governance Portal */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveModule('post-election');
+            if (isMobile) setMobileMenuOpen(false);
+          }}
+          data-testid={isMobile ? 'mobile-sidebar-post-election-btn' : 'sidebar-post-election-btn'}
+          title={sidebarCollapsed && !isMobile ? 'Post-Election Governance & 100-Day Portal' : undefined}
+          className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 min-h-[38px] rounded-lg text-xs font-semibold border transition-colors whitespace-nowrap ${
+            activeModule === 'post-election'
+              ? 'bg-[#0D5C38] text-white border-emerald-500/80 shadow-xs'
+              : 'bg-slate-900/70 text-amber-300 border-amber-700/50 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-2 min-w-0">
+            <Landmark className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            {(!sidebarCollapsed || isMobile) && <span className="truncate">Post-Election Portal</span>}
+          </span>
+          {(!sidebarCollapsed || isMobile) && (
+            <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 shrink-0">
+              GOVT
             </span>
           )}
         </button>

@@ -2,6 +2,7 @@ export type NavModuleId =
   | 'situation-room'
   | 'katsina-simulator'
   | 'voter-sentiment'
+  | 'post-election'
   | 'campaign-overview'
   | 'geographic-ops'
   | 'field-ops'
@@ -510,4 +511,115 @@ export interface OfflineQueueItem {
   summary: string;
   payload: Record<string, unknown>;
   queuedAt: string;
+}
+
+
+export type TransitionPhase =
+  | 'Pre-Inauguration Transition'
+  | 'First 100 Days'
+  | 'Full-Term Delivery';
+
+export type TransitionSector =
+  | 'Security & Peace'
+  | 'Clean Energy & Rimi Wind'
+  | 'AI, Digital & Free Internet'
+  | 'Education & STEM'
+  | 'Healthcare'
+  | 'Agriculture & Economy'
+  | 'Governance & Civil Service';
+
+export type TransitionDayWindow =
+  | 'Days 1–30'
+  | 'Days 31–60'
+  | 'Days 61–100'
+  | 'Year 1';
+
+export type TransitionActionStatus =
+  | 'Planned'
+  | 'In Progress'
+  | 'Completed'
+  | 'Blocked';
+
+export interface TransitionDeliverable {
+  id: string;
+  label: string;
+  done: boolean;
+}
+
+export interface TransitionActionItem {
+  id: string;
+  title: string;
+  sector: TransitionSector;
+  window: TransitionDayWindow;
+  zone: 'Statewide' | 'Katsina Central' | 'Daura (Katsina North)' | 'Funtua (Katsina South)';
+  leadOffice: string;
+  priority: TaskPriority;
+  status: TransitionActionStatus;
+  progressPct: number;
+  targetMetric: string;
+  summary: string;
+  deliverables: TransitionDeliverable[];
+  sourceIdeaId?: string;
+  isDemo?: boolean;
+}
+
+export type GovernanceIdeaStatus =
+  | 'Proposed'
+  | 'Under Review'
+  | 'Approved for Cabinet'
+  | 'In 100-Day Plan';
+
+export interface GovernanceIdea {
+  id: string;
+  title: string;
+  sector: TransitionSector;
+  zone: 'Statewide' | 'Katsina Central' | 'Daura (Katsina North)' | 'Funtua (Katsina South)';
+  summary: string;
+  executionPlan: string;
+  estimatedTimeline: TransitionDayWindow;
+  budgetTier: 'Low Cost / Quick Win' | 'Medium Capital' | 'Major Flagship / PPP';
+  status: GovernanceIdeaStatus;
+  upvotes: number;
+  submittedBy: string;
+  createdAt: string;
+  promotedActionId?: string;
+  isDemo?: boolean;
+}
+
+export type CabinetVettingStatus =
+  | 'Open Portfolio'
+  | 'Transition Committee'
+  | 'Shortlist Vetting'
+  | 'Appointee Confirmed';
+
+export interface CabinetPortfolioItem {
+  id: string;
+  ministryName: string;
+  sector: TransitionSector;
+  statutoryMandate: string;
+  dayOneDirective: string;
+  transitionLead: string;
+  vettingStatus: CabinetVettingStatus;
+  committeeSize: number;
+  kpis: string[];
+  isDemo?: boolean;
+}
+
+export type HandoverAuditStatus =
+  | 'Pending Handover'
+  | 'Documents Requested'
+  | 'Under Review'
+  | 'Verified';
+
+export interface HandoverAuditItem {
+  id: string;
+  workstream: string;
+  department: string;
+  priority: IncidentSeverity;
+  status: HandoverAuditStatus;
+  keyQuestions: string[];
+  notes: string;
+  owner: string;
+  updatedAt: string;
+  isDemo?: boolean;
 }

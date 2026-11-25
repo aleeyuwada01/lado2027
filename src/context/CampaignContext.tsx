@@ -47,10 +47,19 @@ import {
   DEMO_TASKS,
   DEMO_VEHICLES,
 } from '../data/demoSeed';
+import {
+  DEMO_CABINET_PORTFOLIOS,
+  DEMO_GOVERNANCE_IDEAS,
+  DEMO_HANDOVER_AUDITS,
+  DEMO_TRANSITION_ACTIONS,
+} from '../data/postElectionSeed';
+import { promoteIdeaToActionItem } from '../lib/postElection';
 import type {
   AlertRule,
   Announcement,
   AuditLogEntry,
+  CabinetPortfolioItem,
+  CabinetVettingStatus,
   CallOperatorStatus,
   CallRecord,
   CampaignBranding,
@@ -62,6 +71,10 @@ import type {
   FieldReport,
   FieldReportStatus,
   GeoImportJob,
+  GovernanceIdea,
+  GovernanceIdeaStatus,
+  HandoverAuditItem,
+  HandoverAuditStatus,
   ImportedGeoUnit,
   IncidentRecord,
   IncidentStatus,
@@ -76,6 +89,9 @@ import type {
   RoleName,
   SystemNotification,
   TaskStatus,
+  TransitionActionItem,
+  TransitionActionStatus,
+  TransitionPhase,
   VehicleAsset,
 } from '../types/campaign';
 
@@ -171,6 +187,36 @@ interface CampaignContextValue {
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: () => void;
 
+  // Post-Election Governance & Transition Portal
+  transitionPhase: TransitionPhase;
+  setTransitionPhase: (phase: TransitionPhase) => void;
+  transitionActions: TransitionActionItem[];
+  createTransitionAction: (item: Omit<TransitionActionItem, 'id'>) => void;
+  updateTransitionActionStatus: (
+    id: string,
+    status: TransitionActionStatus,
+    progressPct?: number
+  ) => void;
+  toggleTransitionDeliverable: (actionId: string, deliverableId: string) => void;
+  governanceIdeas: GovernanceIdea[];
+  submitGovernanceIdea: (
+    idea: Omit<GovernanceIdea, 'id' | 'status' | 'upvotes' | 'createdAt' | 'promotedActionId'>
+  ) => void;
+  upvoteGovernanceIdea: (id: string) => void;
+  updateGovernanceIdeaStatus: (id: string, status: GovernanceIdeaStatus) => void;
+  promoteGovernanceIdea: (id: string, leadOffice?: string) => string | null;
+  cabinetPortfolios: CabinetPortfolioItem[];
+  addCabinetPortfolio: (portfolio: Omit<CabinetPortfolioItem, 'id'>) => void;
+  updateCabinetPortfolio: (
+    id: string,
+    patch: Partial<Pick<CabinetPortfolioItem, 'vettingStatus' | 'transitionLead' | 'dayOneDirective' | 'committeeSize'>>
+  ) => void;
+  handoverAudits: HandoverAuditItem[];
+  updateHandoverAuditItem: (
+    id: string,
+    patch: Partial<Pick<HandoverAuditItem, 'status' | 'notes' | 'owner'>>
+  ) => void;
+
   // Computed Real-Time Analytics
   metrics: ExecutiveMetrics;
   stateSummaries: Record<string, StateOperationalSummary>;
@@ -237,6 +283,17 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [alertRules, setAlertRules] = useState<AlertRule[]>(DEMO_ALERT_RULES);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(DEMO_AUDIT_LOGS);
   const [notifications, setNotifications] = useState<SystemNotification[]>(DEMO_NOTIFICATIONS);
+  const [transitionPhase, setTransitionPhaseState] = useState<TransitionPhase>(
+    'Pre-Inauguration Transition'
+  );
+  const [transitionActions, setTransitionActions] = useState<TransitionActionItem[]>(
+    DEMO_TRANSITION_ACTIONS
+  );
+  const [governanceIdeas, setGovernanceIdeas] = useState<GovernanceIdea[]>(DEMO_GOVERNANCE_IDEAS);
+  const [cabinetPortfolios, setCabinetPortfolios] = useState<CabinetPortfolioItem[]>(
+    DEMO_CABINET_PORTFOLIOS
+  );
+  const [handoverAudits, setHandoverAudits] = useState<HandoverAuditItem[]>(DEMO_HANDOVER_AUDITS);
 
   // Sync CSS custom properties for dynamic campaign branding colors
   useEffect(() => {
@@ -522,6 +579,10 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setAnnouncements((prev) => prev.filter((x) => !x.isDemo));
     setMediaItems((prev) => prev.filter((x) => !x.isDemo));
     setDocuments((prev) => prev.filter((x) => !x.isDemo));
+    setTransitionActions((prev) => prev.filter((x) => !x.isDemo));
+    setGovernanceIdeas((prev) => prev.filter((x) => !x.isDemo));
+    setCabinetPortfolios((prev) => prev.filter((x) => !x.isDemo));
+    setHandoverAudits((prev) => prev.filter((x) => !x.isDemo));
     appendAuditLog({
       action: 'DEMO_DATA_CLEARED',
       entity: 'System',
@@ -547,6 +608,10 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setMediaItems(DEMO_MEDIA_ITEMS);
     setDocuments(DEMO_DOCUMENTS);
     setNotifications(DEMO_NOTIFICATIONS);
+    setTransitionActions(DEMO_TRANSITION_ACTIONS);
+    setGovernanceIdeas(DEMO_GOVERNANCE_IDEAS);
+    setCabinetPortfolios(DEMO_CABINET_PORTFOLIOS);
+    setHandoverAudits(DEMO_HANDOVER_AUDITS);
     appendAuditLog({
       action: 'DEMO_DATA_RESEEDED',
       entity: 'System',
@@ -1231,6 +1296,201 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  const setTransitionPhase = (phase: TransitionPhase) => {
+    setTransitionPhaseState(phase);
+    appendAuditLog({
+      action: 'TRANSITION_PHASE_UPDATED',
+      entity: 'PostElectionTransition',
+      entityId: phase,
+      summary: `Switched Post-Election Governance Portal phase to "${phase}".`,
+      source: 'Web Command',
+    });
+  };
+
+  const createTransitionAction = (item: Omit<TransitionActionItem, 'id'>) => {
+    const id = makeId('tra');
+    setTransitionActions((prev) => [{ ...item, id }, ...prev]);
+    appendAuditLog({
+      action: 'TRANSITION_ACTION_CREATED',
+      entity: 'TransitionAction',
+      entityId: id,
+      summary: `Added ${item.window} governance action "${item.title}" (${item.sector}).`,
+      source: 'Web Command',
+    });
+  };
+
+  const updateTransitionActionStatus = (
+    id: string,
+    status: TransitionActionStatus,
+    progressPct?: number
+  ) => {
+    const target = transitionActions.find((a) => a.id === id);
+    const resolvedProgress =
+      typeof progressPct === 'number'
+        ? Math.max(0, Math.min(100, progressPct))
+        : status === 'Completed'
+          ? 100
+          : status === 'Planned'
+            ? Math.min(target?.progressPct ?? 15, 25)
+            : Math.max(target?.progressPct ?? 40, 35);
+
+    setTransitionActions((prev) =>
+      prev.map((a) =>
+        a.id === id
+          ? {
+              ...a,
+              status,
+              progressPct: resolvedProgress,
+              deliverables:
+                status === 'Completed'
+                  ? a.deliverables.map((d) => ({ ...d, done: true }))
+                  : a.deliverables,
+            }
+          : a
+      )
+    );
+    appendAuditLog({
+      action: 'TRANSITION_ACTION_UPDATED',
+      entity: 'TransitionAction',
+      entityId: id,
+      summary: `Updated transition action "${target?.title || id}" to ${status} (${resolvedProgress}%).`,
+      source: 'Web Command',
+    });
+  };
+
+  const toggleTransitionDeliverable = (actionId: string, deliverableId: string) => {
+    setTransitionActions((prev) =>
+      prev.map((a) => {
+        if (a.id !== actionId) return a;
+        const nextDeliverables = a.deliverables.map((d) =>
+          d.id === deliverableId ? { ...d, done: !d.done } : d
+        );
+        const doneCount = nextDeliverables.filter((d) => d.done).length;
+        const nextPct =
+          nextDeliverables.length > 0
+            ? Math.round((doneCount / nextDeliverables.length) * 100)
+            : a.progressPct;
+        const nextStatus: TransitionActionStatus =
+          nextPct === 100 ? 'Completed' : doneCount > 0 ? 'In Progress' : 'Planned';
+        return {
+          ...a,
+          deliverables: nextDeliverables,
+          progressPct: nextPct,
+          status: a.status === 'Blocked' ? 'Blocked' : nextStatus,
+        };
+      })
+    );
+  };
+
+  const submitGovernanceIdea = (
+    idea: Omit<GovernanceIdea, 'id' | 'status' | 'upvotes' | 'createdAt' | 'promotedActionId'>
+  ) => {
+    const id = makeId('idea');
+    setGovernanceIdeas((prev) => [
+      {
+        ...idea,
+        id,
+        status: 'Proposed',
+        upvotes: 1,
+        createdAt: new Date().toISOString().slice(0, 10),
+      },
+      ...prev,
+    ]);
+    appendAuditLog({
+      action: 'GOVERNANCE_IDEA_SUBMITTED',
+      entity: 'GovernanceIdea',
+      entityId: id,
+      summary: `Submitted governance plan idea "${idea.title}" (${idea.sector}).`,
+      source: 'Web Command',
+    });
+  };
+
+  const upvoteGovernanceIdea = (id: string) => {
+    setGovernanceIdeas((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, upvotes: i.upvotes + 1 } : i))
+    );
+  };
+
+  const updateGovernanceIdeaStatus = (id: string, status: GovernanceIdeaStatus) => {
+    const target = governanceIdeas.find((i) => i.id === id);
+    setGovernanceIdeas((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
+    appendAuditLog({
+      action: 'GOVERNANCE_IDEA_STATUS_UPDATED',
+      entity: 'GovernanceIdea',
+      entityId: id,
+      summary: `Updated governance idea "${target?.title || id}" to ${status}.`,
+      source: 'Web Command',
+    });
+  };
+
+  const promoteGovernanceIdea = (id: string, leadOffice?: string): string | null => {
+    const idea = governanceIdeas.find((i) => i.id === id);
+    if (!idea) return null;
+    if (idea.promotedActionId) return idea.promotedActionId;
+
+    const actionId = makeId('tra');
+    const draftAction = promoteIdeaToActionItem(idea, leadOffice);
+    setTransitionActions((prev) => [{ ...draftAction, id: actionId }, ...prev]);
+    setGovernanceIdeas((prev) =>
+      prev.map((i) =>
+        i.id === id ? { ...i, status: 'In 100-Day Plan', promotedActionId: actionId } : i
+      )
+    );
+    appendAuditLog({
+      action: 'GOVERNANCE_IDEA_PROMOTED',
+      entity: 'TransitionAction',
+      entityId: actionId,
+      summary: `Promoted governance idea "${idea.title}" into ${draftAction.window} Action Plan.`,
+      source: 'Web Command',
+    });
+    return actionId;
+  };
+
+  const addCabinetPortfolio = (portfolio: Omit<CabinetPortfolioItem, 'id'>) => {
+    const id = makeId('cab');
+    setCabinetPortfolios((prev) => [{ ...portfolio, id }, ...prev]);
+    appendAuditLog({
+      action: 'CABINET_PORTFOLIO_CREATED',
+      entity: 'CabinetPortfolio',
+      entityId: id,
+      summary: `Added ministry/agency portfolio "${portfolio.ministryName}".`,
+      source: 'Web Command',
+    });
+  };
+
+  const updateCabinetPortfolio = (
+    id: string,
+    patch: Partial<Pick<CabinetPortfolioItem, 'vettingStatus' | 'transitionLead' | 'dayOneDirective' | 'committeeSize'>>
+  ) => {
+    const target = cabinetPortfolios.find((c) => c.id === id);
+    setCabinetPortfolios((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    appendAuditLog({
+      action: 'CABINET_PORTFOLIO_UPDATED',
+      entity: 'CabinetPortfolio',
+      entityId: id,
+      summary: `Updated "${target?.ministryName || id}": ${Object.keys(patch).join(', ')}.`,
+      source: 'Web Command',
+    });
+  };
+
+  const updateHandoverAuditItem = (
+    id: string,
+    patch: Partial<Pick<HandoverAuditItem, 'status' | 'notes' | 'owner'>>
+  ) => {
+    const target = handoverAudits.find((a) => a.id === id);
+    const today = new Date().toISOString().slice(0, 10);
+    setHandoverAudits((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, ...patch, updatedAt: today } : a))
+    );
+    appendAuditLog({
+      action: 'HANDOVER_AUDIT_UPDATED',
+      entity: 'HandoverAudit',
+      entityId: id,
+      summary: `Updated handover audit "${target?.workstream || id}"${patch.status ? ` to ${patch.status}` : ''}.`,
+      source: 'Web Command',
+    });
+  };
+
   const syncOfflineQueue = () => {
     if (offlineQueue.length === 0) return;
     const count = offlineQueue.length;
@@ -1355,6 +1615,22 @@ export const CampaignProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     notifications,
     markNotificationRead,
     markAllNotificationsRead,
+    transitionPhase,
+    setTransitionPhase,
+    transitionActions,
+    createTransitionAction,
+    updateTransitionActionStatus,
+    toggleTransitionDeliverable,
+    governanceIdeas,
+    submitGovernanceIdea,
+    upvoteGovernanceIdea,
+    updateGovernanceIdeaStatus,
+    promoteGovernanceIdea,
+    cabinetPortfolios,
+    addCabinetPortfolio,
+    updateCabinetPortfolio,
+    handoverAudits,
+    updateHandoverAuditItem,
     metrics,
     stateSummaries,
     zoneSummaries,

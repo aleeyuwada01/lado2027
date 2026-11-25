@@ -8,6 +8,7 @@ const MODULE_INDEX: Array<{ id: NavModuleId; label: string; group: string }> = [
   { id: 'situation-room', label: 'Executive Situation Room', group: 'Command' },
   { id: 'katsina-simulator', label: 'Katsina INEC & Victory Simulator', group: 'Command' },
   { id: 'voter-sentiment', label: 'Voter Sentiment Intelligence Hub', group: 'Command' },
+  { id: 'post-election', label: 'Post-Election Governance & Transition Portal', group: 'Transition & Govt' },
   { id: 'campaign-overview', label: 'Campaign Overview', group: 'Command' },
   { id: 'geographic-ops', label: 'Geographic Operations', group: 'Geography & Field' },
   { id: 'field-ops', label: 'Field Operations & Mobile PWA', group: 'Geography & Field' },
