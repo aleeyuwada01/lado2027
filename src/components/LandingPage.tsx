@@ -29,6 +29,7 @@ import { t } from '../lib/i18n';
 import { computeTransitionReadiness } from '../lib/postElection';
 import { NigeriaMap } from './NigeriaMap';
 import { LandingSimulationSnippet } from './LandingSimulationSnippet';
+import { ElectionCountdownBanner } from './ElectionCountdownBanner';
 import {
   createDefaultSimulationConfig,
   runKatsinaSimulation,
@@ -477,6 +478,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterCommand }) => {
       </header>
 
       <main id="top">
+        {/* Giant Real-Time Election Countdown to Victory (Feb 6, 2027 Governorship / Jan 16, 2027 Presidential) */}
+        <ElectionCountdownBanner language={language} />
+
         {/* Welcome Editorial Hero + Live "Lado Wins Katsina" LGA-Capture Simulation Above the Fold */}
         <section className="bg-white border-b border-slate-200/80">
           <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-10 lg:py-14">
