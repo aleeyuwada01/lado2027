@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CampaignProvider, useCampaign } from './context/CampaignContext';
 import { LandingPage } from './components/LandingPage';
@@ -7,6 +7,67 @@ import { CommandSearchModal } from './components/CommandSearchModal';
 import { SetupWizardModal } from './components/SetupWizardModal';
 import { CampaignLoader } from './components/CampaignLoader';
 import type { NavModuleId } from './types/campaign';
+
+const VALID_MODULE_IDS = new Set<NavModuleId>([
+  'situation-room',
+  'katsina-simulator',
+  'voter-sentiment',
+  'campaign-overview',
+  'geographic-ops',
+  'field-ops',
+  'agents-volunteers',
+  'call-center',
+  'incidents',
+  'events',
+  'logistics',
+  'organization',
+  'polling-coverage',
+  'election-day',
+  'reports-analytics',
+  'communications',
+  'media-monitoring',
+  'documents',
+  'tasks',
+  'security-audit',
+  'settings-admin',
+]);
+
+function resolveRouteFromLocation(): {
+  showLanding: boolean;
+  initialModule: NavModuleId;
+  openSentiment: boolean;
+} {
+  if (typeof window === 'undefined') {
+    return { showLanding: true, initialModule: 'situation-room', openSentiment: false };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const pathSegment = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  const queryModule = params.get('module')?.toLowerCase() ?? '';
+  const openSentiment = params.get('sentiment') === '1';
+
+  if (VALID_MODULE_IDS.has(pathSegment as NavModuleId)) {
+    return {
+      showLanding: false,
+      initialModule: pathSegment as NavModuleId,
+      openSentiment,
+    };
+  }
+
+  if (VALID_MODULE_IDS.has(queryModule as NavModuleId)) {
+    return {
+      showLanding: false,
+      initialModule: queryModule as NavModuleId,
+      openSentiment,
+    };
+  }
+
+  if (params.get('autostart') === '1') {
+    return { showLanding: false, initialModule: 'situation-room', openSentiment };
+  }
+
+  return { showLanding: true, initialModule: 'situation-room', openSentiment };
+}
 
 import { SituationRoomView } from './modules/SituationRoomView';
 import { KatsinaSimulatorView } from './modules/KatsinaSimulatorView';
@@ -91,15 +152,64 @@ const ActiveModuleSwitch: React.FC = () => {
 };
 
 const CampaignAppShell: React.FC = () => {
-  const { setActiveModule, branding } = useCampaign();
-  const [showLanding, setShowLanding] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('autostart') === '1') return false;
+  const { activeModule, setActiveModule, branding } = useCampaign();
+  const initialRouteRef = useRef(resolveRouteFromLocation());
+  const routeReadyRef = useRef<boolean>(
+    initialRouteRef.current.showLanding || initialRouteRef.current.initialModule === 'situation-room'
+  );
+  const skipNextPushRef = useRef<boolean>(false);
+
+  const [showLanding, setShowLanding] = useState<boolean>(initialRouteRef.current.showLanding);
+  const [openSentimentOnEnter, setOpenSentimentOnEnter] = useState<boolean>(
+    initialRouteRef.current.openSentiment
+  );
+
+  // Sync initial deep-link route (e.g. /katsina-simulator) and normalize unknown paths
+  useEffect(() => {
+    const initial = initialRouteRef.current;
+    if (!initial.showLanding) {
+      setActiveModule(initial.initialModule);
+      return;
     }
-    return true;
-  });
-  const [openSentimentOnEnter, setOpenSentimentOnEnter] = useState<boolean>(false);
+    const cleanPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
+    if (cleanPath && cleanPath !== 'index.html') {
+      window.history.replaceState(null, '', `/${window.location.search}${window.location.hash}`);
+    }
+  }, [setActiveModule]);
+
+  // Keep browser URL synchronized with active module and handle Back/Forward navigation
+  useEffect(() => {
+    const onPopState = () => {
+      const next = resolveRouteFromLocation();
+      skipNextPushRef.current = true;
+      setShowLanding(next.showLanding);
+      setOpenSentimentOnEnter(next.openSentiment);
+      if (!next.showLanding) {
+        setActiveModule(next.initialModule);
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [setActiveModule]);
+
+  useEffect(() => {
+    if (!routeReadyRef.current) {
+      if (activeModule === initialRouteRef.current.initialModule) {
+        routeReadyRef.current = true;
+      }
+      return;
+    }
+    if (skipNextPushRef.current) {
+      skipNextPushRef.current = false;
+      return;
+    }
+    const targetPath = showLanding ? '/' : `/${activeModule}`;
+    const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+    if (currentPath !== targetPath) {
+      const nextUrl = showLanding ? '/' : `${targetPath}${window.location.search}`;
+      window.history.pushState(null, '', nextUrl);
+    }
+  }, [activeModule, showLanding]);
 
   // Branded executive boot sequence when the application launches
   const [bootVisible, setBootVisible] = useState<boolean>(() => {
@@ -151,6 +261,7 @@ const CampaignAppShell: React.FC = () => {
     const label =
       MODULE_TRANSITION_LABELS[initialModule] ?? 'Entering Campaign Command Center...';
     setShellTransition({ active: true, status: label, progress: 38 });
+    routeReadyRef.current = true;
     setActiveModule(initialModule);
     setOpenSentimentOnEnter(Boolean(options?.openSentiment));
     setShowLanding(false);
@@ -170,6 +281,7 @@ const CampaignAppShell: React.FC = () => {
       status: 'Returning to Campaign Home...',
       progress: 48,
     });
+    routeReadyRef.current = true;
     setShowLanding(true);
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     window.setTimeout(() => {

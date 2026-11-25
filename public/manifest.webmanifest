@@ -1,10 +1,21 @@
 {
+  "id": "/",
   "name": "Yakubu Lado Dan Marke — Campaign Command",
   "short_name": "YLDM Command",
   "description": "Political Campaign Command, Situation Room, and Mobile Field Operations Platform",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0B1324",
-  "theme_color": "#0B1324",
-  "orientation": "any"
+  "theme_color": "#0D5C38",
+  "orientation": "any",
+  "categories": ["government", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

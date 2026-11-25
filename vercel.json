@@ -1,0 +1,140 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/command",
+      "destination": "/situation-room",
+      "permanent": false
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/situation-room",
+      "permanent": false
+    },
+    {
+      "source": "/simulator",
+      "destination": "/katsina-simulator",
+      "permanent": false
+    },
+    {
+      "source": "/katsina",
+      "destination": "/katsina-simulator",
+      "permanent": false
+    },
+    {
+      "source": "/sentiment",
+      "destination": "/voter-sentiment",
+      "permanent": false
+    },
+    {
+      "source": "/geo",
+      "destination": "/geographic-ops",
+      "permanent": false
+    },
+    {
+      "source": "/field",
+      "destination": "/field-ops",
+      "permanent": false
+    },
+    {
+      "source": "/mobile",
+      "destination": "/field-ops",
+      "permanent": false
+    },
+    {
+      "source": "/admin",
+      "destination": "/settings-admin",
+      "permanent": false
+    },
+    {
+      "source": "/settings",
+      "destination": "/settings-admin",
+      "permanent": false
+    },
+    {
+      "source": "/assets/aistudio/:path*",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!assets/|src/assets/|manifest\\.webmanifest|favicon\\.svg|robots\\.txt).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/src/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(self), camera=(), microphone=()"
+        }
+      ]
+    }
+  ]
+}
