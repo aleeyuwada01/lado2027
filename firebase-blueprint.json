@@ -1,0 +1,210 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authorized campaign platform user profile with RBAC role and geographic scope.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "role": { "type": "string", "minLength": 2, "maxLength": 64 },
+        "department": { "type": "string", "maxLength": 80 },
+        "assignedStateCode": { "type": "string", "maxLength": 16 },
+        "assignedLga": { "type": "string", "maxLength": 80 },
+        "status": { "type": "string", "enum": ["active", "inactive", "pending"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "role", "status", "createdAt", "updatedAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Isolated PII record for a user (email, phone, emergency contact).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 160 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "emergencyContact": { "type": "string", "maxLength": 160 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "updatedAt"]
+    },
+    "CampaignBranding": {
+      "title": "CampaignBranding",
+      "description": "Configurable campaign identity, candidate profile, colors, and asset slots.",
+      "type": "object",
+      "properties": {
+        "campaignName": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "candidateName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "electionType": { "type": "string", "maxLength": 80 },
+        "electionYear": { "type": "string", "maxLength": 10 },
+        "headquarters": { "type": "string", "maxLength": 160 },
+        "partyAffiliation": { "type": "string", "maxLength": 120 },
+        "slogan": { "type": "string", "maxLength": 180 },
+        "biography": { "type": "string", "maxLength": 2000 },
+        "primaryColor": { "type": "string", "maxLength": 16 },
+        "accentColor": { "type": "string", "maxLength": 16 },
+        "contactEmail": { "type": "string", "maxLength": 120 },
+        "contactPhone": { "type": "string", "maxLength": 40 },
+        "electionDayMode": { "type": "boolean" },
+        "updatedBy": { "type": "string", "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["campaignName", "candidateName", "primaryColor", "accentColor", "electionDayMode", "updatedBy", "updatedAt"]
+    },
+    "Incident": {
+      "title": "Incident",
+      "description": "Operational incident record with workflow status and strict verification classification.",
+      "type": "object",
+      "properties": {
+        "refCode": { "type": "string", "maxLength": 32 },
+        "title": { "type": "string", "minLength": 3, "maxLength": 180 },
+        "category": { "type": "string", "maxLength": 64 },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "status": { "type": "string", "enum": ["New", "Assigned", "Acknowledged", "Investigating", "Action Required", "Resolved", "Closed"] },
+        "verificationStatus": { "type": "string", "enum": ["Unverified Report", "Allegation", "Verified Fact"] },
+        "stateCode": { "type": "string", "maxLength": 16 },
+        "lga": { "type": "string", "maxLength": 80 },
+        "ward": { "type": "string", "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "reporterUid": { "type": "string", "maxLength": 128 },
+        "reporterName": { "type": "string", "maxLength": 120 },
+        "assignedTeam": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["refCode", "title", "category", "severity", "status", "verificationStatus", "stateCode", "description", "reporterUid", "createdAt", "updatedAt"]
+    },
+    "FieldReport": {
+      "title": "FieldReport",
+      "description": "Field operational report or election-day campaign submission with reviewer workflow.",
+      "type": "object",
+      "properties": {
+        "refCode": { "type": "string", "maxLength": 32 },
+        "reportType": { "type": "string", "maxLength": 64 },
+        "stateCode": { "type": "string", "maxLength": 16 },
+        "lga": { "type": "string", "maxLength": 80 },
+        "ward": { "type": "string", "maxLength": 80 },
+        "pollingUnit": { "type": "string", "maxLength": 120 },
+        "summary": { "type": "string", "maxLength": 2000 },
+        "dataLabel": { "type": "string", "enum": ["Campaign-Reported Data", "Unverified Data", "Verified Campaign Submission", "Official Published Source"] },
+        "status": { "type": "string", "enum": ["Submitted", "Pending Review", "Under Verification", "Verified", "Rejected", "Requires Clarification"] },
+        "submitterUid": { "type": "string", "maxLength": 128 },
+        "submitterName": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["refCode", "reportType", "stateCode", "summary", "dataLabel", "status", "submitterUid", "createdAt", "updatedAt"]
+    },
+    "CampaignTask": {
+      "title": "CampaignTask",
+      "description": "Operational task tracked across departments and geography.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 2, "maxLength": 180 },
+        "department": { "type": "string", "maxLength": 80 },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+        "status": { "type": "string", "enum": ["Backlog", "Pending", "Assigned", "In Progress", "Awaiting Approval", "Blocked", "Completed", "Cancelled"] },
+        "stateCode": { "type": "string", "maxLength": 16 },
+        "assigneeName": { "type": "string", "maxLength": 120 },
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "dueDate": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "department", "priority", "status", "ownerUid", "createdAt", "updatedAt"]
+    },
+    "CallRecord": {
+      "title": "CallRecord",
+      "description": "Call center operational intake record and case tracking.",
+      "type": "object",
+      "properties": {
+        "refCode": { "type": "string", "maxLength": 32 },
+        "direction": { "type": "string", "enum": ["incoming", "outgoing"] },
+        "category": { "type": "string", "maxLength": 64 },
+        "subject": { "type": "string", "maxLength": 180 },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "status": { "type": "string", "enum": ["Waiting", "Active", "Open Case", "Escalated", "Resolved"] },
+        "operatorUid": { "type": "string", "maxLength": 128 },
+        "operatorName": { "type": "string", "maxLength": 120 },
+        "stateCode": { "type": "string", "maxLength": 16 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["refCode", "direction", "category", "subject", "priority", "status", "operatorUid", "createdAt", "updatedAt"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Append-only immutable audit record of critical campaign operations.",
+      "type": "object",
+      "properties": {
+        "actorUid": { "type": "string", "maxLength": 128 },
+        "actorName": { "type": "string", "maxLength": 120 },
+        "actorRole": { "type": "string", "maxLength": 64 },
+        "action": { "type": "string", "maxLength": 80 },
+        "entity": { "type": "string", "maxLength": 64 },
+        "entityId": { "type": "string", "maxLength": 128 },
+        "summary": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["actorUid", "actorName", "actorRole", "action", "entity", "entityId", "summary", "createdAt"]
+    },
+    "OperationalRecord": {
+      "title": "OperationalRecord",
+      "description": "Structured operational entity for agents, events, vehicles, inventory, logistics, announcements, media, documents, and geo imports.",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "stateCode": { "type": "string", "maxLength": 16 },
+        "title": { "type": "string", "maxLength": 180 },
+        "status": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerUid", "title", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Public/operational user profile metadata without private PII."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivateInfo" },
+      "description": "Isolated PII subcollection restricted strictly to owner and admin."
+    },
+    "/admins/{adminUid}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Authoritative admin registry evaluated by Firestore rules."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/CampaignBranding" },
+      "description": "Campaign branding, alert rules, and operational mode settings."
+    },
+    "/incidents/{incidentId}": {
+      "schema": { "$ref": "#/entities/Incident" },
+      "description": "Incident management records with verification and workflow state."
+    },
+    "/field_reports/{reportId}": {
+      "schema": { "$ref": "#/entities/FieldReport" },
+      "description": "Field operations and election-day verification reports."
+    },
+    "/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/CampaignTask" },
+      "description": "Campaign task workflow records."
+    },
+    "/calls/{callId}": {
+      "schema": { "$ref": "#/entities/CallRecord" },
+      "description": "Call center logs and escalated cases."
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Immutable append-only operational audit trail."
+    },
+    "/campaigns_state/{recordId}": {
+      "schema": { "$ref": "#/entities/OperationalRecord" },
+      "description": "Scoped operational modules (agents, events, logistics, announcements, media, documents, imported geo units)."
+    }
+  }
+}

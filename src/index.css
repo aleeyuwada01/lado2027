@@ -1,0 +1,180 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Instrument Sans", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Instrument Sans", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-body: "Plus Jakarta Sans", "Instrument Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "Instrument Sans", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --campaign-primary: #0D5C38;
+  --campaign-primary-hover: #09452A;
+  --campaign-accent: #B91C1C;
+  --campaign-gold: #B45309;
+  --campaign-navy: #0A0F1A;
+  --font-display: "Instrument Sans", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-body: "Plus Jakarta Sans", "Instrument Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "Instrument Sans", "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.55;
+    background-color: #F6F8FA;
+    color: #0F172A;
+  }
+
+  .dark body {
+    background-color: #070B14;
+    color: #F1F5F9;
+  }
+
+  h1, h2, h3, h4, h5, h6, button, input, select, textarea, .font-display {
+    font-family: var(--font-display);
+  }
+
+  h1, h2, h3, h4, .font-display {
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+  }
+
+  .font-mono, code, pre, .tabular-nums {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes campaign-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes campaign-orbit-reverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes campaign-breathe {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+@keyframes campaign-sheen {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+.animate-campaign-orbit {
+  animation: campaign-orbit 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-campaign-orbit-reverse {
+  animation: campaign-orbit-reverse 6.5s linear infinite;
+}
+
+.animate-campaign-breathe {
+  animation: campaign-breathe 2.6s ease-in-out infinite;
+}
+
+.animate-campaign-sheen {
+  animation: campaign-sheen 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-campaign-orbit,
+  .animate-campaign-orbit-reverse,
+  .animate-campaign-breathe,
+  .animate-campaign-sheen {
+    animation: none !important;
+  }
+}
+
+/* Mapbox / MapLibre GL control refinements */
+.mapboxgl-ctrl-attrib,
+.maplibregl-ctrl-attrib {
+  font-family: var(--font-body) !important;
+  font-size: 10px !important;
+  opacity: 0.72;
+}
+
+.mapboxgl-popup-content,
+.maplibregl-popup-content {
+  padding: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.35) !important;
+}
+
+/* Custom subtle scrollbars for command center panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.32);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.52);
+}
+
+/* Print-friendly layout for executive reports */
+@media print {
+  aside,
+  header,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+}

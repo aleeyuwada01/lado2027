@@ -1,0 +1,6 @@
+{
+  "name": "Yakubu Lado Dan Marke — Campaign Command & Operations Platform",
+  "description": "Enterprise political campaign operations, executive situation room, Nigerian geographic operations, field intelligence, call center, incident response, and election-day coordination platform for Yakubu Lado Dan Marke.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

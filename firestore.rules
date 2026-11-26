@@ -1,0 +1,385 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 0: Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Primitive Helpers ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return isVerified() && request.auth.uid == uid;
+    }
+
+    function isBootstrappedAdmin() {
+      return isVerified() && request.auth.token.email == 'Aleeyuwada01@gmail.com';
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || (isVerified() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isNonEmptyString(val, maxLen) {
+      return val is string && val.size() >= 1 && val.size() <= maxLen;
+    }
+
+    function isOptionalString(data, key, maxLen) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxLen);
+    }
+
+    // --- Validation Blueprints ---
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'role', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'role', 'department', 'assignedStateCode', 'assignedLga', 'status', 'createdAt', 'updatedAt'])
+        && isValidId(data.uid)
+        && isNonEmptyString(data.displayName, 120)
+        && isNonEmptyString(data.role, 64)
+        && isOptionalString(data, 'department', 80)
+        && isOptionalString(data, 'assignedStateCode', 16)
+        && isOptionalString(data, 'assignedLga', 80)
+        && data.status in ['active', 'inactive', 'pending']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivateInfo(data) {
+      return data.keys().hasAll(['uid', 'email', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'phone', 'emergencyContact', 'updatedAt'])
+        && isValidId(data.uid)
+        && isNonEmptyString(data.email, 160)
+        && isOptionalString(data, 'phone', 32)
+        && isOptionalString(data, 'emergencyContact', 160)
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCampaignBranding(data) {
+      return data.keys().hasAll(['campaignName', 'candidateName', 'primaryColor', 'accentColor', 'electionDayMode', 'updatedBy', 'updatedAt'])
+        && data.keys().hasOnly(['campaignName', 'candidateName', 'electionType', 'electionYear', 'headquarters', 'partyAffiliation', 'slogan', 'biography', 'primaryColor', 'accentColor', 'contactEmail', 'contactPhone', 'electionDayMode', 'updatedBy', 'updatedAt'])
+        && isNonEmptyString(data.campaignName, 140)
+        && isNonEmptyString(data.candidateName, 120)
+        && isOptionalString(data, 'electionType', 80)
+        && isOptionalString(data, 'electionYear', 10)
+        && isOptionalString(data, 'headquarters', 160)
+        && isOptionalString(data, 'partyAffiliation', 120)
+        && isOptionalString(data, 'slogan', 180)
+        && isOptionalString(data, 'biography', 2000)
+        && isNonEmptyString(data.primaryColor, 16)
+        && isNonEmptyString(data.accentColor, 16)
+        && isOptionalString(data, 'contactEmail', 120)
+        && isOptionalString(data, 'contactPhone', 40)
+        && data.electionDayMode is bool
+        && isValidId(data.updatedBy)
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidIncident(data) {
+      return data.keys().hasAll(['refCode', 'title', 'category', 'severity', 'status', 'verificationStatus', 'stateCode', 'description', 'reporterUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['refCode', 'title', 'category', 'severity', 'status', 'verificationStatus', 'stateCode', 'lga', 'ward', 'description', 'reporterUid', 'reporterName', 'assignedTeam', 'createdAt', 'updatedAt'])
+        && isNonEmptyString(data.refCode, 32)
+        && isNonEmptyString(data.title, 180)
+        && isNonEmptyString(data.category, 64)
+        && data.severity in ['low', 'medium', 'high', 'critical']
+        && data.status in ['New', 'Assigned', 'Acknowledged', 'Investigating', 'Action Required', 'Resolved', 'Closed']
+        && data.verificationStatus in ['Unverified Report', 'Allegation', 'Verified Fact']
+        && isNonEmptyString(data.stateCode, 16)
+        && isOptionalString(data, 'lga', 80)
+        && isOptionalString(data, 'ward', 80)
+        && isNonEmptyString(data.description, 2000)
+        && isValidId(data.reporterUid)
+        && isOptionalString(data, 'reporterName', 120)
+        && isOptionalString(data, 'assignedTeam', 100)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidFieldReport(data) {
+      return data.keys().hasAll(['refCode', 'reportType', 'stateCode', 'summary', 'dataLabel', 'status', 'submitterUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['refCode', 'reportType', 'stateCode', 'lga', 'ward', 'pollingUnit', 'summary', 'dataLabel', 'status', 'submitterUid', 'submitterName', 'createdAt', 'updatedAt'])
+        && isNonEmptyString(data.refCode, 32)
+        && isNonEmptyString(data.reportType, 64)
+        && isNonEmptyString(data.stateCode, 16)
+        && isOptionalString(data, 'lga', 80)
+        && isOptionalString(data, 'ward', 80)
+        && isOptionalString(data, 'pollingUnit', 120)
+        && isNonEmptyString(data.summary, 2000)
+        && data.dataLabel in ['Campaign-Reported Data', 'Unverified Data', 'Verified Campaign Submission', 'Official Published Source']
+        && data.status in ['Submitted', 'Pending Review', 'Under Verification', 'Verified', 'Rejected', 'Requires Clarification']
+        && isValidId(data.submitterUid)
+        && isOptionalString(data, 'submitterName', 120)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCampaignTask(data) {
+      return data.keys().hasAll(['title', 'department', 'priority', 'status', 'ownerUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['title', 'department', 'priority', 'status', 'stateCode', 'assigneeName', 'ownerUid', 'dueDate', 'createdAt', 'updatedAt'])
+        && isNonEmptyString(data.title, 180)
+        && isNonEmptyString(data.department, 80)
+        && data.priority in ['low', 'medium', 'high', 'urgent']
+        && data.status in ['Backlog', 'Pending', 'Assigned', 'In Progress', 'Awaiting Approval', 'Blocked', 'Completed', 'Cancelled']
+        && isOptionalString(data, 'stateCode', 16)
+        && isOptionalString(data, 'assigneeName', 120)
+        && isValidId(data.ownerUid)
+        && isOptionalString(data, 'dueDate', 32)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCallRecord(data) {
+      return data.keys().hasAll(['refCode', 'direction', 'category', 'subject', 'priority', 'status', 'operatorUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['refCode', 'direction', 'category', 'subject', 'priority', 'status', 'operatorUid', 'operatorName', 'stateCode', 'createdAt', 'updatedAt'])
+        && isNonEmptyString(data.refCode, 32)
+        && data.direction in ['incoming', 'outgoing']
+        && isNonEmptyString(data.category, 64)
+        && isNonEmptyString(data.subject, 180)
+        && data.priority in ['low', 'medium', 'high', 'critical']
+        && data.status in ['Waiting', 'Active', 'Open Case', 'Escalated', 'Resolved']
+        && isValidId(data.operatorUid)
+        && isOptionalString(data, 'operatorName', 120)
+        && isOptionalString(data, 'stateCode', 16)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAuditLog(data) {
+      return data.keys().hasAll(['actorUid', 'actorName', 'actorRole', 'action', 'entity', 'entityId', 'summary', 'createdAt'])
+        && data.keys().hasOnly(['actorUid', 'actorName', 'actorRole', 'action', 'entity', 'entityId', 'summary', 'createdAt'])
+        && isValidId(data.actorUid)
+        && isNonEmptyString(data.actorName, 120)
+        && isNonEmptyString(data.actorRole, 64)
+        && isNonEmptyString(data.action, 80)
+        && isNonEmptyString(data.entity, 64)
+        && isNonEmptyString(data.entityId, 128)
+        && isNonEmptyString(data.summary, 500)
+        && data.createdAt is timestamp;
+    }
+
+    function isValidOperationalRecord(data) {
+      return data.keys().hasAll(['ownerUid', 'title', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['ownerUid', 'stateCode', 'title', 'status', 'createdAt', 'updatedAt'])
+        && isValidId(data.ownerUid)
+        && isOptionalString(data, 'stateCode', 16)
+        && isNonEmptyString(data.title, 180)
+        && isNonEmptyString(data.status, 64)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+
+    // 1. Users (Public operational metadata; PII isolated in /private)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isVerified() && (resource.data.uid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isValidId(userId) && isVerified() && isValidUserProfile(incoming())
+        && incoming().uid == userId
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (request.auth.uid == userId && incoming().role in ['Volunteer', 'Read-Only Viewer', 'Polling Unit Agent'])
+        );
+      allow update: if isValidId(userId) && isVerified() && isValidUserProfile(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (isOwner(userId) && incoming().role == existing().role && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'updatedAt']))
+        );
+      allow delete: if isValidId(userId) && isAdmin();
+
+      match /private/{docId} {
+        allow get: if isValidId(userId) && isValidId(docId) && (isOwner(userId) || isAdmin());
+        allow list: if isVerified() && (resource.data.uid == request.auth.uid || isBootstrappedAdmin());
+        allow create: if isValidId(userId) && isValidId(docId) && isVerified() && isValidUserPrivateInfo(incoming())
+          && incoming().uid == userId
+          && incoming().updatedAt == request.time
+          && (isOwner(userId) || isAdmin());
+        allow update: if isValidId(userId) && isValidId(docId) && isVerified() && isValidUserPrivateInfo(incoming())
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time
+          && (
+            isAdmin() ||
+            (isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'phone', 'emergencyContact', 'updatedAt']))
+          );
+        allow delete: if isValidId(userId) && isValidId(docId) && isAdmin();
+      }
+    }
+
+    // 2. Admins registry
+    match /admins/{adminUid} {
+      allow get: if isValidId(adminUid) && (isOwner(adminUid) || isAdmin());
+      allow list: if isBootstrappedAdmin();
+      allow create: if isValidId(adminUid) && isBootstrappedAdmin() && isValidUserProfile(incoming())
+        && incoming().uid == adminUid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(adminUid) && isBootstrappedAdmin() && isValidUserProfile(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time;
+      allow delete: if isValidId(adminUid) && isBootstrappedAdmin();
+    }
+
+    // 3. Campaign Settings & Branding
+    match /settings/{settingId} {
+      allow get: if isValidId(settingId) && isVerified();
+      allow list: if isBootstrappedAdmin();
+      allow create: if isValidId(settingId) && isAdmin() && isValidCampaignBranding(incoming())
+        && incoming().updatedBy == request.auth.uid
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(settingId) && isAdmin() && isValidCampaignBranding(incoming())
+        && incoming().updatedBy == request.auth.uid
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'campaignName', 'candidateName', 'electionType', 'electionYear', 'headquarters',
+          'partyAffiliation', 'slogan', 'biography', 'primaryColor', 'accentColor',
+          'contactEmail', 'contactPhone', 'electionDayMode', 'updatedBy', 'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    // 4. Incidents
+    match /incidents/{incidentId} {
+      allow get: if isValidId(incidentId) && isVerified() && (existing().reporterUid == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.reporterUid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isValidId(incidentId) && isVerified() && isValidIncident(incoming())
+        && incoming().reporterUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(incidentId) && isVerified() && isValidIncident(incoming())
+        && incoming().reporterUid == existing().reporterUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            existing().status != 'Closed'
+            && existing().reporterUid == request.auth.uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['description', 'status', 'updatedAt'])
+          )
+        );
+      allow delete: if isValidId(incidentId) && isAdmin();
+    }
+
+    // 5. Field Reports & Election-Day Submissions
+    match /field_reports/{reportId} {
+      allow get: if isValidId(reportId) && isVerified() && (existing().submitterUid == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.submitterUid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isValidId(reportId) && isVerified() && isValidFieldReport(incoming())
+        && incoming().submitterUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(reportId) && isVerified() && isValidFieldReport(incoming())
+        && incoming().submitterUid == existing().submitterUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            !(existing().status in ['Verified', 'Rejected'])
+            && existing().submitterUid == request.auth.uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['summary', 'updatedAt'])
+          )
+        );
+      allow delete: if isValidId(reportId) && isAdmin();
+    }
+
+    // 6. Tasks & Workflow
+    match /tasks/{taskId} {
+      allow get: if isValidId(taskId) && isVerified() && (existing().ownerUid == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.ownerUid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isValidId(taskId) && isVerified() && isValidCampaignTask(incoming())
+        && incoming().ownerUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(taskId) && isVerified() && isValidCampaignTask(incoming())
+        && incoming().ownerUid == existing().ownerUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            !(existing().status in ['Completed', 'Cancelled'])
+            && existing().ownerUid == request.auth.uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'priority', 'assigneeName', 'dueDate', 'updatedAt'])
+          )
+        );
+      allow delete: if isValidId(taskId) && isAdmin();
+    }
+
+    // 7. Call Center Records
+    match /calls/{callId} {
+      allow get: if isValidId(callId) && isVerified() && (existing().operatorUid == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.operatorUid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isValidId(callId) && isVerified() && isValidCallRecord(incoming())
+        && incoming().operatorUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(callId) && isVerified() && isValidCallRecord(incoming())
+        && incoming().operatorUid == existing().operatorUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            existing().status != 'Resolved'
+            && existing().operatorUid == request.auth.uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'priority', 'subject', 'updatedAt'])
+          )
+        );
+      allow delete: if isValidId(callId) && isAdmin();
+    }
+
+    // 8. Immutable Audit Logs (Append-Only)
+    match /audit_logs/{logId} {
+      allow get: if isValidId(logId) && isAdmin();
+      allow list: if isBootstrappedAdmin();
+      allow create: if isValidId(logId) && isVerified() && isValidAuditLog(incoming())
+        && incoming().actorUid == request.auth.uid
+        && incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // 9. Scoped Operational Records
+    match /campaigns_state/{recordId} {
+      allow get: if isValidId(recordId) && isVerified() && (existing().ownerUid == request.auth.uid || isAdmin());
+      allow list: if isVerified() && (resource.data.ownerUid == request.auth.uid || isBootstrappedAdmin());
+      allow create: if isValidId(recordId) && isVerified() && isValidOperationalRecord(incoming())
+        && incoming().ownerUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(recordId) && isVerified() && isValidOperationalRecord(incoming())
+        && incoming().ownerUid == existing().ownerUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (existing().ownerUid == request.auth.uid && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'status', 'updatedAt']))
+        );
+      allow delete: if isValidId(recordId) && isAdmin();
+    }
+  }
+}

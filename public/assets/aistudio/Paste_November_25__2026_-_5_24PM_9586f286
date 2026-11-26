@@ -1,0 +1,1617 @@
+# MASTER BUILD PROMPT — YAKUBU LADO DAN MARKE POLITICAL CAMPAIGN COMMAND & OPERATIONS PLATFORM
+
+## ROLE & MISSION
+
+Act as a world-class team consisting of:
+
+- Principal Software Architect
+- Senior Full-Stack Engineer
+- UI/UX Design Director
+- Supabase/PostgreSQL Database Architect
+- GIS & Mapping Engineer
+- Cybersecurity Engineer
+- Data Analytics Engineer
+- QA & Automation Engineer
+
+Your task is to design and build a complete, production-grade **Political Campaign Operations, Election Situation Room, Field Intelligence, and Command Center Platform** for the political campaign of **Yakubu Lado Dan Marke**.
+
+This must be a premium, enterprise-grade political operations platform. Do not build a basic admin dashboard, template CRUD application, landing page, or ordinary campaign website.
+
+The system should feel like a sophisticated national campaign command center used by a serious gubernatorial, presidential, or major political campaign organization.
+
+The platform must combine campaign administration, operational coordination, call center management, field agents, volunteer management, event planning, logistics, situation-room monitoring, incident management, communications, data analysis, and reporting into one integrated system.
+
+The system should be designed for Nigerian political and geographic realities, with complete Nigerian administrative geography and the ability to operate across all 36 states, the FCT, 774 Local Government Areas, wards, and polling units.
+
+---
+
+# 1. PROJECT IDENTITY & BRANDING
+
+## Candidate
+
+**Yakubu Lado Dan Marke**
+
+Build a campaign platform that can be branded around the candidate and his campaign identity.
+
+The candidate's profile, campaign slogan, party affiliation, campaign logo, party logo, photographs, contact information, campaign colors, and branding assets must be configurable through a branding settings module.
+
+### Branding requirements
+
+- Candidate portrait photography.
+- Candidate profile and biography.
+- Party logo.
+- Campaign logo.
+- Official campaign colors.
+- Campaign slogan.
+- Campaign headquarters branding.
+- Campaign banner and cover imagery.
+- Official campaign contact details.
+- Social media links.
+- Campaign identity across all dashboard modules.
+- Configurable campaign branding for desktop, mobile, login, and printable reports.
+
+Do not invent the candidate's official party affiliation, logo, campaign slogan, or official photographs.
+
+Create a professional branding asset management interface where administrators can upload the actual candidate photographs, party logo, campaign logo, banners, and other approved campaign assets.
+
+Use placeholders until official assets are supplied. Structure the design so replacing placeholders requires no redesign.
+
+### Visual design direction
+
+The interface must look exceptional.
+
+Create a sophisticated, premium political command center inspired by:
+
+- Enterprise intelligence dashboards.
+- Modern financial trading terminals.
+- Government operations centers.
+- Enterprise GIS platforms.
+- High-end CRM systems.
+- Modern SaaS applications.
+- Live emergency response command dashboards.
+
+Avoid generic AI-generated dashboard aesthetics, excessive gradients, unnecessary glassmorphism, oversized rounded cards, emoji-heavy interfaces, repetitive UI cards, and template-like designs.
+
+Use:
+
+- A strong professional design system.
+- Deep navy, charcoal, warm white, and campaign-configurable accent colors.
+- Restrained use of the candidate's official colors.
+- High-quality typography.
+- Clear information hierarchy.
+- Dense but readable operational information.
+- Excellent charts and data visualization.
+- Professional maps.
+- Beautiful empty states.
+- Carefully designed loading states.
+- Responsive desktop, tablet, and mobile layouts.
+
+The situation room desktop interface should be optimized for campaign headquarters and large displays. Mobile interfaces must be designed for field coordinators, agents, volunteers, and supervisors.
+
+The entire product must feel like a high-budget enterprise product.
+
+---
+
+# 2. TECHNOLOGY STACK — SUPABASE FIRST
+
+Use Supabase as the primary backend infrastructure.
+
+## Frontend
+
+Use the existing project stack if it is already established and stable. If starting from scratch, use:
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- A high-quality component system such as shadcn/ui
+- Lucide icons
+- React Router
+- TanStack Query
+- React Hook Form
+- Zod
+- Recharts or another high-quality visualization library
+- Mapbox or an equivalent GIS mapping service
+- Progressive Web App capabilities for mobile field operations
+
+## Backend
+
+Use Supabase for:
+
+- PostgreSQL database
+- Authentication
+- Row Level Security
+- Storage
+- Realtime subscriptions
+- Edge Functions
+- Database functions
+- Scheduled jobs where applicable
+- Audit logging
+- Backend integrations
+
+Do not build a separate backend server unless a specific technical requirement makes it necessary.
+
+All sensitive operations must be securely enforced on the backend. Never trust the frontend to enforce permissions.
+
+## Supabase requirements
+
+- Proper relational database design.
+- Foreign keys.
+- Appropriate indexes.
+- Database constraints.
+- RLS policies on all sensitive tables.
+- Secure role-based access control.
+- Storage bucket security.
+- Realtime subscriptions where appropriate.
+- Secure Edge Functions.
+- Database migrations.
+- Seed scripts.
+- Backup and recovery considerations.
+- Environment variable management.
+- No hardcoded secrets.
+- No service-role key exposed to frontend.
+- Server-side validation for sensitive operations.
+
+---
+
+# 3. PLATFORM STRUCTURE
+
+Build the platform around the following main navigation.
+
+1. Executive Situation Room
+2. Campaign Overview
+3. Geographic Operations
+4. Field Operations
+5. Agent & Volunteer Management
+6. Call Center
+7. Incident Management
+8. Campaign Events
+9. Logistics & Transportation
+10. Campaign Organization
+11. Polling Unit Coverage
+12. Election-Day Operations
+13. Reports & Analytics
+14. Communications & Announcements
+15. Media Monitoring
+16. Campaign Documents
+17. Tasks & Workflow
+18. Security & Audit
+19. Settings & Administration
+
+Create a collapsible professional sidebar, command search, notifications, current user profile, campaign selector if multiple campaigns are supported, and a clearly visible operational status indicator.
+
+---
+
+# 4. EXECUTIVE SITUATION ROOM
+
+This is the most important interface.
+
+Design a highly sophisticated live command center for the candidate, campaign director, campaign manager, operations director, and authorized senior leadership.
+
+The dashboard must support a large-screen display mode for a physical campaign situation room.
+
+## Executive dashboard metrics
+
+Display relevant operational metrics such as:
+
+- Total registered campaign personnel.
+- Active field coordinators.
+- Registered field agents.
+- Agents checked in.
+- Volunteer participation.
+- Geographic coverage.
+- Reporting coverage.
+- Polling units with assigned agents.
+- Polling units without assigned agents.
+- Pending field reports.
+- Open incidents.
+- High-priority incidents.
+- Resolved incidents.
+- Calls received.
+- Calls waiting.
+- Calls currently being handled.
+- Unresolved call tickets.
+- Events scheduled today.
+- Logistics requests.
+- Pending task assignments.
+- Regional operational status.
+
+All metrics must be calculated from actual database records. Do not hardcode dashboard figures.
+
+## Situation room visual layout
+
+Create a premium command center layout featuring:
+
+- Large interactive geographic map.
+- Geographic reporting and coverage layers.
+- Regional operational summary.
+- Live incident feed.
+- Incoming report feed.
+- Call center status.
+- Agent check-in activity.
+- Task escalation panel.
+- Campaign activity timeline.
+- Critical alert panel.
+- Operational performance charts.
+- State/LGA/ward drill-down.
+- Date/time indicator.
+- Realtime data synchronization indicator.
+
+Create an optional fullscreen presentation mode suitable for large displays and campaign headquarters.
+
+Use Supabase Realtime for appropriate live updates.
+
+## Alerts
+
+Create a configurable notification and alert system for:
+
+- New high-priority incidents.
+- Unresolved critical issues.
+- New reports requiring review.
+- Call center backlog.
+- Logistics requests requiring approval.
+- Personnel needing assistance.
+- Communication outages.
+- Reporting delays.
+- Important task deadlines.
+- Scheduled campaign activities.
+
+Allow administrators to configure alert severity, recipients, escalation rules, and notification channels.
+
+---
+
+# 5. GEOGRAPHIC OPERATIONS & NIGERIA GEO-DATABASE
+
+This is a critical feature.
+
+Build a complete geographic hierarchy:
+
+Nigeria
+→ State
+→ Local Government Area
+→ Ward
+→ Polling Unit
+
+Include:
+
+- All 36 states.
+- Federal Capital Territory.
+- All 774 LGAs.
+- Wards within LGAs.
+- Polling units within wards.
+
+Use verified, official geographic datasets wherever possible.
+
+Do not fabricate wards, polling units, polling-unit codes, boundaries, coordinates, or geographic statistics.
+
+If official data is not yet available, build the import system and show clearly marked placeholders rather than fabricated records.
+
+## Geographic dashboard
+
+Users should be able to:
+
+- View Nigeria on an interactive map.
+- Select a state.
+- Drill down into LGAs.
+- Drill down into wards.
+- View polling units.
+- Search for any administrative area.
+- View geographic records in list or map format.
+- Import geographic datasets.
+- Export authorized geographic information.
+- View operational status of each geographic area.
+- Assign authorized campaign personnel to administrative areas.
+- View field reporting status.
+- View incident locations.
+- View campaign events.
+- View agent assignments.
+- View logistics operations.
+
+## Geographic coverage indicators
+
+Use neutral operational coverage metrics such as:
+
+- Personnel assigned.
+- Personnel checked in.
+- Reports submitted.
+- Reports awaiting verification.
+- Incidents recorded.
+- Polling units with operational reporting agents.
+- Polling units without operational reporting agents.
+- Geographic areas with incomplete operational coverage.
+
+These indicators should describe campaign operations, not infer political beliefs or individual voter behavior.
+
+## Geography import system
+
+Support:
+
+- CSV.
+- Excel.
+- JSON.
+- GeoJSON for boundary data.
+- Bulk import.
+- Validation.
+- Duplicate detection.
+- Import preview.
+- Import history.
+- Error reporting.
+- Record reconciliation.
+- Rollback where possible.
+
+Provide downloadable import templates.
+
+---
+
+# 6. CAMPAIGN ORGANIZATION & STRUCTURE
+
+Build a hierarchical campaign organization management system.
+
+Support configurable organizational structures such as:
+
+- Campaign headquarters.
+- State campaign leadership.
+- Senatorial district coordinators.
+- LGA coordinators.
+- Ward coordinators.
+- Polling unit coordinators.
+- Field agents.
+- Volunteers.
+- Professional teams.
+- Campaign departments.
+- Special operations teams.
+- Logistics teams.
+- Communications teams.
+- Call center operators.
+
+The organizational structure must be configurable depending on the election and campaign.
+
+## Personnel profiles
+
+Each authorized campaign team member may have:
+
+- Full name.
+- Profile photo.
+- Contact information.
+- Assigned role.
+- Organizational unit.
+- State.
+- LGA.
+- Ward.
+- Polling unit where appropriate.
+- Supervisor.
+- Status.
+- Registration date.
+- Assigned tasks.
+- Check-in records.
+- Training records.
+- Activity history.
+- Emergency contact if voluntarily provided and appropriately secured.
+
+Use permissions and privacy controls to ensure users can only access information they are authorized to see.
+
+Do not create voter political-affiliation profiling or psychographic/personality profiling.
+
+---
+
+# 7. FIELD OPERATIONS
+
+Create a comprehensive field operations management system.
+
+## Field dashboard
+
+- Active field personnel.
+- Coordinators.
+- Agent assignments.
+- Check-in status.
+- Task assignments.
+- Field reports.
+- Incident reports.
+- Geographic operational coverage.
+- Personnel requiring assistance.
+- Activity timeline.
+
+## Field check-in
+
+Authorized personnel can:
+
+- Check in.
+- Check out.
+- Submit location if location sharing is enabled and clearly disclosed.
+- Submit operational status.
+- Upload supporting photos.
+- Submit field notes.
+- Request assistance.
+- Report connectivity issues.
+- Submit an incident.
+- Update task status.
+
+Location tracking must be permission-based, disclosed, limited to legitimate operational use, and subject to configurable retention policies.
+
+Do not implement covert tracking.
+
+## Mobile field application
+
+Build an excellent mobile-first experience.
+
+Support:
+
+- Offline-first field reporting.
+- Local data storage.
+- Background synchronization when connectivity returns.
+- Pending sync queue.
+- Sync status.
+- Conflict resolution.
+- Form validation.
+- Photo uploads.
+- GPS capture with permission.
+- Lightweight data usage.
+- Fast navigation.
+- Installable PWA.
+
+Field users should not need a laptop to perform their work.
+
+---
+
+# 8. CALL CENTER & CONTACT MANAGEMENT
+
+Build a professional call center system capable of supporting a campaign headquarters with multiple operators and supervisors.
+
+## Call center dashboard
+
+Display:
+
+- Total calls today.
+- Incoming calls.
+- Outgoing calls.
+- Calls waiting.
+- Active operators.
+- Available operators.
+- Busy operators.
+- Average handling time.
+- Abandoned calls.
+- Resolved cases.
+- Open cases.
+- Escalated cases.
+- Call volume chart.
+- Operator performance and workload.
+
+## Call management
+
+Create call records with:
+
+- Call reference number.
+- Caller name when voluntarily supplied.
+- Phone number when necessary and consented.
+- Call type.
+- Subject.
+- Description.
+- Operator.
+- Date and time.
+- Status.
+- Priority.
+- Assigned department.
+- Follow-up requirements.
+- Resolution.
+- Escalation history.
+- Related incident or task.
+
+## Call categories
+
+- General campaign inquiry.
+- Campaign office inquiry.
+- Volunteer inquiry.
+- Event inquiry.
+- Logistics inquiry.
+- Technical support.
+- Personnel assistance.
+- Safety concern.
+- Incident report.
+- General complaint.
+- Other.
+
+## Operator interface
+
+Build a specialized call operator screen:
+
+- Incoming call notification.
+- Caller information where lawfully available.
+- Call classification.
+- Structured notes.
+- Case creation.
+- Priority assignment.
+- Supervisor escalation.
+- Follow-up task creation.
+- Case status.
+- Call history.
+- Quick navigation.
+
+Integrate VoIP or telephony APIs only where credentials and supported providers are available. Otherwise, create a provider-independent integration architecture and a working manual call-recording workflow.
+
+Call recordings must require appropriate authorization, notice, and legal compliance.
+
+Do not use call center data to build voter persuasion profiles, psychological profiles, or individualized political influence scores.
+
+---
+
+# 9. INCIDENT MANAGEMENT & RESPONSE
+
+Build a serious incident management system.
+
+## Incident types
+
+- Operational issue.
+- Personnel assistance.
+- Logistics failure.
+- Communication outage.
+- Safety concern.
+- Event disruption.
+- Equipment issue.
+- Infrastructure issue.
+- Report discrepancy.
+- General emergency.
+- Other.
+
+## Incident workflow
+
+New
+→ Assigned
+→ Acknowledged
+→ Investigating
+→ Action Required
+→ Resolved
+→ Closed
+
+Support:
+
+- Incident ID.
+- Severity.
+- Category.
+- Description.
+- Location.
+- Reporting person.
+- Assigned team.
+- Assigned supervisor.
+- Evidence attachments.
+- Timeline.
+- Actions taken.
+- Escalation.
+- Resolution notes.
+- Audit history.
+
+## Incident dashboard
+
+- Map of incidents.
+- Incident severity breakdown.
+- Open incidents.
+- Critical incidents.
+- Incidents by geographic area.
+- Incident response times.
+- Incident resolution times.
+- Recent incident timeline.
+- Escalation queue.
+
+Include a clear distinction between verified facts, unverified reports, and allegations.
+
+Never present an unverified incident as established fact.
+
+---
+
+# 10. AGENT MANAGEMENT & POLLING UNIT COVERAGE
+
+Build a complete campaign agent management module.
+
+## Agent registration
+
+- Name.
+- Contact information.
+- Profile.
+- Agent type.
+- Assigned state.
+- Assigned LGA.
+- Ward.
+- Polling unit.
+- Supervisor.
+- Registration status.
+- Training status.
+- Deployment status.
+- Check-in status.
+
+## Agent assignment
+
+Allow authorized managers to:
+
+- Assign agents to geographic areas.
+- Reassign agents.
+- Assign supervisors.
+- View coverage gaps.
+- View deployment status.
+- Track check-in.
+- Track training completion.
+- View agent operational reports.
+- Export deployment reports.
+
+## Polling unit coverage
+
+Display:
+
+- Total polling units in the selected geography.
+- Polling units with assigned campaign agents.
+- Polling units without assigned agents.
+- Agents checked in.
+- Agents yet to check in.
+- Coverage by state.
+- Coverage by LGA.
+- Coverage by ward.
+- Coverage by polling unit.
+
+Use transparent operational coverage statistics. Do not use coverage information to generate targeted persuasion recommendations or individual political profiles.
+
+---
+
+# 11. ELECTION-DAY OPERATIONS
+
+Build a dedicated election-day operating mode that can be activated by an authorized administrator.
+
+The election-day dashboard should be optimized for real-time campaign operational monitoring.
+
+## Features
+
+- Agent check-in.
+- Field personnel status.
+- Operational reports.
+- Incident reporting.
+- Communication status.
+- Polling-unit agent assignments.
+- Report submission tracking.
+- Reports awaiting review.
+- Verified operational reports.
+- Missing reports.
+- Supervisor escalation.
+- Geographic coverage.
+- Task dispatch.
+- Emergency requests.
+- Timeline.
+- Realtime updates.
+
+## Report workflow
+
+Submitted
+→ Pending Review
+→ Under Verification
+→ Verified / Rejected / Requires Clarification
+
+Reports must maintain:
+
+- Submitter.
+- Submission time.
+- Location.
+- Supporting evidence where appropriate.
+- Reviewer.
+- Verification time.
+- Status history.
+- Audit trail.
+
+Where polling-unit figures are collected, use strict validation, source attribution, reviewer approval, and clear labels.
+
+The platform must never present campaign-collected or uploaded figures as official INEC results.
+
+Clearly label:
+
+- Campaign-reported data.
+- Unverified data.
+- Verified campaign submissions.
+- Official published results when linked to an authenticated official source.
+
+Do not create fabricated election results or automatically infer missing results.
+
+---
+
+# 12. TASK MANAGEMENT & OPERATIONS WORKFLOW
+
+Create a complete campaign task management system.
+
+## Task features
+
+- Create tasks.
+- Assign tasks.
+- Departments.
+- Supervisors.
+- Due dates.
+- Priority.
+- Status.
+- Attachments.
+- Comments.
+- Subtasks.
+- Approval workflow.
+- Escalation.
+- Reminders.
+- Activity timeline.
+
+## Task statuses
+
+- Backlog.
+- Pending.
+- Assigned.
+- In Progress.
+- Awaiting Approval.
+- Blocked.
+- Completed.
+- Cancelled.
+
+## Views
+
+- Kanban.
+- List.
+- Calendar.
+- Timeline.
+- Geographic task map.
+
+Create reusable task templates for campaign activities, administrative processes, event setup, field deployment, reporting, and logistics.
+
+---
+
+# 13. EVENTS & CAMPAIGN SCHEDULE
+
+Build a comprehensive event planning module.
+
+Support:
+
+- Campaign rallies.
+- Town halls.
+- Community meetings.
+- Stakeholder meetings.
+- Press events.
+- Campaign office activities.
+- Volunteer training.
+- Internal meetings.
+- Public campaign events.
+
+## Event management
+
+- Event title.
+- Description.
+- Date.
+- Time.
+- Location.
+- Venue.
+- Event organizer.
+- Responsible team.
+- Estimated attendance.
+- Event status.
+- Required equipment.
+- Logistics.
+- Assigned personnel.
+- Budget.
+- Tasks.
+- Notes.
+- Attachments.
+- Event checklist.
+- Event reporting.
+
+## Event calendar
+
+- Daily.
+- Weekly.
+- Monthly.
+- Agenda.
+- Geographic view.
+
+Allow authorized personnel to coordinate event operations, schedules, venues, transportation, equipment, and responsible teams.
+
+---
+
+# 14. LOGISTICS & RESOURCE MANAGEMENT
+
+Build a full logistics module.
+
+## Assets
+
+- Vehicles.
+- Fuel.
+- Equipment.
+- Campaign materials.
+- Office equipment.
+- Communication equipment.
+- Supplies.
+- Event materials.
+
+## Logistics requests
+
+- Requester.
+- Department.
+- Geographic location.
+- Requested item.
+- Quantity.
+- Priority.
+- Purpose.
+- Approval status.
+- Assigned logistics officer.
+- Fulfillment status.
+- Delivery confirmation.
+
+## Vehicle management
+
+- Vehicle registration.
+- Vehicle type.
+- Driver.
+- Assignment.
+- Availability.
+- Maintenance.
+- Fuel records.
+- Trip logs.
+- Trip status.
+
+## Inventory
+
+- Item.
+- Quantity.
+- Storage location.
+- Reorder level.
+- Stock movement.
+- Supplier.
+- Request history.
+- Approval.
+- Audit.
+
+Build an operational resource management interface, not merely a basic inventory table.
+
+---
+
+# 15. COMMUNICATIONS & ANNOUNCEMENTS
+
+Build an internal campaign communications center.
+
+Features:
+
+- Internal announcements.
+- Department announcements.
+- State-level announcements.
+- LGA-level announcements.
+- Ward-level announcements.
+- Team notifications.
+- Task notifications.
+- Event reminders.
+- Incident alerts.
+- Read receipts where appropriate.
+- Notification history.
+
+Allow role-authorized administrators to create and distribute operational announcements to the appropriate organizational units.
+
+Support:
+
+- In-app notifications.
+- Email integration.
+- SMS integration through configurable providers.
+- WhatsApp Business integration where authorized and supported.
+
+Use consent-based communications, unsubscribe/opt-out controls where required, and appropriate privacy safeguards.
+
+Do not implement individualized political persuasion, voter psychological targeting, or manipulative messaging based on sensitive personal information.
+
+---
+
+# 16. MEDIA & PUBLIC INFORMATION MONITORING
+
+Build a public-information monitoring module designed for campaign situational awareness.
+
+Potential integrations:
+
+- News sources.
+- RSS feeds.
+- Public announcements.
+- Public social media content through permitted APIs.
+- Campaign's official social accounts.
+- Publicly available reports.
+
+Features:
+
+- Source management.
+- Monitoring feed.
+- Search.
+- Topic classification.
+- Geographic tags.
+- Event references.
+- Duplicate detection.
+- Source links.
+- Timestamp.
+- Review status.
+- Notes.
+- Public information dashboard.
+
+Clearly distinguish:
+
+- Confirmed reporting.
+- Public statements.
+- Commentary.
+- Unverified information.
+
+Do not implement covert surveillance, private account monitoring, scraping private data, or individual political-belief profiling.
+
+---
+
+# 17. ANALYTICS & REPORTING
+
+Build powerful operational analytics.
+
+## Operational analytics
+
+- Field personnel deployment.
+- Personnel check-ins.
+- Reporting completion.
+- Geographic coverage.
+- Incident response.
+- Call center performance.
+- Tasks completed.
+- Event execution.
+- Logistics fulfillment.
+- Inventory.
+- Agent training.
+- Organizational activity.
+
+## Geographic analytics
+
+- State-level summary.
+- LGA-level summary.
+- Ward-level summary.
+- Polling-unit operational summary.
+- Reporting completeness.
+- Operational coverage.
+- Incident distribution.
+- Activity distribution.
+
+## Reporting system
+
+Allow authorized users to generate:
+
+- Daily campaign operations report.
+- Situation-room report.
+- Field activity report.
+- Incident report.
+- Call center report.
+- Event report.
+- Logistics report.
+- Agent deployment report.
+- Geographic coverage report.
+- Election-day operations report.
+
+Reports must support:
+
+- PDF export.
+- Excel export.
+- CSV export.
+- Print-friendly layouts.
+- Date range selection.
+- Geographic filtering.
+- Department filtering.
+- Role-based access.
+
+All reports must use real database data.
+
+---
+
+# 18. DATA PROTECTION & ANALYTICS POLICY
+
+Implement useful campaign analytics without creating invasive voter profiling systems.
+
+Permitted analytics should focus on:
+
+- Aggregate operational activity.
+- Aggregate geographic reporting.
+- Volunteer participation.
+- Campaign personnel deployment.
+- Events.
+- Public information.
+- Call center operations.
+- Task execution.
+- Logistics.
+- Incident response.
+- Publicly available election data with appropriate sourcing.
+
+Do not build:
+
+- Individual voter psychological profiles.
+- Personality inference.
+- Political susceptibility scores.
+- Individualized persuasion scoring.
+- Sensitive-trait inference.
+- Covert behavioral profiling.
+- Manipulative personalized political messaging.
+- Political beliefs inferred from phone calls, social media, location, or other private data.
+- Targeting lists based on sensitive personal attributes.
+- Systems for suppressing participation or discouraging voting.
+- Automated decisions that deny individuals access or rights based on political characteristics.
+
+If voter-related records are legally permitted and explicitly required by the campaign, ensure that any contact-management functionality is consent-based, limited to appropriate purposes, securely stored, access-controlled, and compliant with Nigerian data-protection requirements.
+
+Analytics should primarily be aggregated and operational.
+
+---
+
+# 19. USER ROLES & PERMISSIONS
+
+Implement robust role-based access control.
+
+Suggested roles:
+
+- Platform Super Administrator.
+- Campaign Administrator.
+- Candidate / Executive Viewer.
+- Campaign Director.
+- Campaign Manager.
+- Situation Room Director.
+- State Coordinator.
+- LGA Coordinator.
+- Ward Coordinator.
+- Field Supervisor.
+- Polling Unit Agent.
+- Call Center Supervisor.
+- Call Center Operator.
+- Incident Manager.
+- Logistics Manager.
+- Events Manager.
+- Communications Manager.
+- Data Analyst.
+- Auditor.
+- Volunteer.
+- Read-Only Viewer.
+
+Permissions must be granular.
+
+A state coordinator should generally only access authorized geographic areas.
+
+An LGA coordinator should only access authorized LGAs.
+
+A ward coordinator should only access authorized wards.
+
+A field agent should only access the information required for their assignments.
+
+Executives may receive aggregated dashboards.
+
+Sensitive personal records must not be exposed to users who do not need access.
+
+Implement:
+
+- Permission matrix.
+- Role assignment.
+- Geographic scope.
+- Department scope.
+- Read/write permissions.
+- Approval permissions.
+- Export permissions.
+- Administrative permissions.
+
+---
+
+# 20. AUTHENTICATION & SECURITY
+
+Use Supabase Auth.
+
+Implement:
+
+- Secure login.
+- Password reset.
+- Email verification.
+- Invitation-based account creation.
+- User activation/deactivation.
+- Session management.
+- Optional MFA.
+- Secure account recovery.
+- Role-based onboarding.
+- User profile.
+- Access logs.
+
+Security features:
+
+- RLS on all relevant tables.
+- Secure storage access.
+- Audit logs.
+- Rate limiting for sensitive operations.
+- Input validation.
+- XSS protection.
+- CSRF protections where applicable.
+- Secure file upload.
+- File type validation.
+- Permission checks.
+- Secure secrets management.
+- Authentication safeguards.
+- Suspicious activity logging.
+
+Never rely exclusively on frontend permissions.
+
+---
+
+# 21. AUDIT & ACCOUNTABILITY
+
+Create a comprehensive audit system.
+
+Log important activities including:
+
+- User login.
+- User creation.
+- User role changes.
+- Geographic assignment changes.
+- Agent assignment.
+- Report submission.
+- Report review.
+- Incident changes.
+- Task assignments.
+- Approvals.
+- Exports.
+- Data imports.
+- Administrative settings changes.
+- File uploads.
+- Sensitive record access where appropriate.
+
+Audit records should include:
+
+- User.
+- Action.
+- Entity.
+- Entity ID.
+- Timestamp.
+- Relevant metadata.
+- Previous value and new value where appropriate.
+- Source/context.
+
+Audit logs should be protected from unauthorized modification.
+
+---
+
+# 22. DATABASE DESIGN
+
+Create a carefully designed Supabase schema.
+
+Suggested tables include:
+
+- profiles
+- user_roles
+- role_permissions
+- campaigns
+- campaign_branding
+- campaign_departments
+- campaign_organization_units
+- states
+- local_government_areas
+- wards
+- polling_units
+- geographic_boundaries
+- personnel
+- volunteers
+- field_agents
+- agent_assignments
+- agent_checkins
+- field_reports
+- report_reviews
+- incidents
+- incident_updates
+- incident_attachments
+- tasks
+- task_assignments
+- task_comments
+- task_attachments
+- events
+- event_attendees
+- event_tasks
+- event_logistics
+- vehicles
+- vehicle_assignments
+- inventory_items
+- inventory_movements
+- logistics_requests
+- logistics_approvals
+- call_center_operators
+- call_records
+- call_cases
+- call_case_updates
+- announcements
+- notifications
+- media_sources
+- media_items
+- documents
+- document_categories
+- audit_logs
+- import_jobs
+- campaign_settings
+
+Adjust and normalize the schema as necessary.
+
+Do not create one giant table.
+
+Use relationships, indexes, constraints, timestamps, soft deletion where appropriate, and migrations.
+
+Create database diagrams or schema documentation.
+
+---
+
+# 23. SUPABASE REALTIME
+
+Use realtime selectively for:
+
+- Situation-room metrics.
+- Incident updates.
+- Field check-ins.
+- Report submissions.
+- Call center queue.
+- Notifications.
+- Task updates.
+- Operational alerts.
+
+Avoid subscribing every user to every table.
+
+Create efficient subscriptions based on permissions and geographic scope.
+
+Ensure realtime changes are also properly secured.
+
+---
+
+# 24. UX & DESIGN REQUIREMENTS
+
+Every module must be fully designed.
+
+Do not create empty pages containing only headings.
+
+Every screen should include:
+
+- Purposeful layout.
+- Functional navigation.
+- Real data or useful empty states.
+- Search.
+- Filters.
+- Sorting.
+- Pagination where necessary.
+- Detail views.
+- Create/edit forms.
+- Validation.
+- Status indicators.
+- Appropriate actions.
+- Loading states.
+- Error states.
+- Confirmation dialogs for destructive operations.
+- Responsive layouts.
+
+Create specialized interfaces for:
+
+- Desktop executive dashboard.
+- Large-screen situation room.
+- Call center operator.
+- Call center supervisor.
+- Field agent mobile app.
+- Geographic coordinator.
+- Incident management.
+- Logistics management.
+- Data review.
+- Administrator.
+
+Use realistic seed data for development, clearly labelled as DEMO DATA.
+
+Never make fake metrics look like real campaign data.
+
+---
+
+# 25. DEMO & INITIALIZATION
+
+Create a development/demo mode.
+
+Seed sample data for:
+
+- Campaign organizational structure.
+- Sample personnel.
+- Sample field agents.
+- Sample tasks.
+- Sample incidents.
+- Sample events.
+- Sample calls.
+- Sample logistics.
+- Sample reports.
+- Sample notifications.
+
+Demo data must be clearly identified.
+
+The system must allow the demo dataset to be cleared and replaced with real campaign data.
+
+Create a setup wizard for the initial campaign administrator.
+
+The setup wizard should include:
+
+1. Campaign name.
+2. Candidate name.
+3. Election type.
+4. Election year.
+5. Campaign headquarters.
+6. Party affiliation.
+7. Campaign logo.
+8. Candidate portrait.
+9. Party logo.
+10. Campaign colors.
+11. Campaign departments.
+12. Geographic scope.
+13. Administrator creation.
+14. Operational configuration.
+
+---
+
+# 26. PERFORMANCE & SCALABILITY
+
+The platform should be capable of supporting:
+
+- Thousands of campaign users.
+- Large numbers of field agents.
+- Hundreds of concurrent users.
+- Multiple call center operators.
+- High-volume report submissions.
+- Realtime operational updates.
+- Thousands of geographic records.
+- Large attachment collections.
+- Campaign-wide data analysis.
+
+Optimize:
+
+- Database queries.
+- Indexes.
+- Pagination.
+- Realtime subscriptions.
+- Geographic queries.
+- File uploads.
+- Dashboard aggregation.
+- Caching.
+- Mobile performance.
+
+Do not load the entire Nigerian geographic database into the browser at once.
+
+Use server-side pagination, filtered queries, and appropriate map clustering.
+
+---
+
+# 27. TESTING & QUALITY ASSURANCE
+
+Do not consider the project complete merely because it compiles.
+
+Perform comprehensive testing.
+
+## Test areas
+
+- Authentication.
+- Role permissions.
+- RLS.
+- User invitation.
+- Geographic restrictions.
+- Personnel management.
+- Agent assignments.
+- Check-ins.
+- Offline synchronization.
+- Field reporting.
+- Incident workflows.
+- Call center workflows.
+- Task workflows.
+- Event workflows.
+- Logistics.
+- Inventory.
+- Notifications.
+- Realtime updates.
+- File uploads.
+- Imports.
+- Exports.
+- Search.
+- Filtering.
+- Mobile responsiveness.
+- Error handling.
+- Security.
+- Performance.
+
+Create automated tests where practical.
+
+Test with different user roles.
+
+Test unauthorized access.
+
+Test geographic permission boundaries.
+
+Test edge cases.
+
+Fix discovered bugs before marking modules complete.
+
+---
+
+# 28. IMPLEMENTATION STRATEGY
+
+Do not attempt to create every feature in a single uncontrolled code dump.
+
+Work systematically.
+
+## Phase 1 — Foundation
+
+- Inspect existing codebase.
+- Establish architecture.
+- Design system.
+- Supabase configuration.
+- Authentication.
+- User profiles.
+- Role-based access.
+- Database schema.
+- RLS.
+- Campaign branding.
+- Geographic database framework.
+- Main application navigation.
+
+## Phase 2 — Core Dashboard
+
+- Campaign overview.
+- Executive dashboard.
+- Situation room.
+- Geographic map.
+- Notifications.
+- Realtime infrastructure.
+
+## Phase 3 — Campaign Organization
+
+- Personnel.
+- Departments.
+- Organizational hierarchy.
+- Coordinators.
+- Volunteers.
+- Field agents.
+- Geographic assignments.
+
+## Phase 4 — Field Operations
+
+- Check-ins.
+- Field reporting.
+- Offline mode.
+- Agent mobile interface.
+- Task assignments.
+- Coverage dashboards.
+
+## Phase 5 — Call Center
+
+- Operators.
+- Call records.
+- Queue management.
+- Cases.
+- Escalations.
+- Supervisor dashboard.
+
+## Phase 6 — Incident Management
+
+- Incident creation.
+- Incident workflow.
+- Escalation.
+- Evidence.
+- Geographic map.
+- Incident analytics.
+
+## Phase 7 — Campaign Operations
+
+- Events.
+- Logistics.
+- Vehicles.
+- Inventory.
+- Tasks.
+- Announcements.
+
+## Phase 8 — Election-Day Operations
+
+- Election-day mode.
+- Reporting.
+- Verification workflow.
+- Coverage monitoring.
+- Live operational dashboard.
+
+## Phase 9 — Analytics & Reporting
+
+- Operational analytics.
+- Geographic reports.
+- PDF exports.
+- Excel/CSV exports.
+- Executive reports.
+
+## Phase 10 — Security & Launch
+
+- Full RLS audit.
+- Permission testing.
+- Performance testing.
+- Mobile testing.
+- Bug fixes.
+- Production deployment documentation.
+
+---
+
+# 29. AI CODING AGENT WORKFLOW
+
+Before writing code:
+
+1. Inspect the entire existing codebase.
+2. Identify the framework, dependencies, structure, and current functionality.
+3. Identify existing Supabase configuration.
+4. Review existing database schema.
+5. Identify incomplete functionality.
+6. Preserve useful existing code.
+7. Avoid unnecessary rewrites.
+8. Create a detailed implementation plan.
+9. Create a project architecture document.
+10. Create a feature progress tracker.
+
+Create and maintain the following project documents:
+
+- `PROJECT_MASTER_PLAN.md`
+- `ARCHITECTURE.md`
+- `DATABASE_SCHEMA.md`
+- `SECURITY_AND_RLS.md`
+- `DESIGN_SYSTEM.md`
+- `FEATURE_PROGRESS.md`
+- `TESTING_PLAN.md`
+- `DEPLOYMENT_GUIDE.md`
+- `CHANGELOG.md`
+
+Update these documents whenever meaningful architecture or implementation changes occur.
+
+## Development rules
+
+- Do not stop after creating the plan.
+- Begin implementation immediately after the initial inspection and planning.
+- Complete features end-to-end.
+- Avoid dead buttons.
+- Avoid fake functionality.
+- Avoid placeholder pages except for clearly identified future integrations.
+- Do not hardcode dashboard metrics.
+- Do not hardcode geographic statistics.
+- Do not fabricate official data.
+- Do not bypass security for convenience.
+- Do not expose Supabase secrets.
+- Do not leave TypeScript errors.
+- Do not leave broken routes.
+- Do not leave major TODOs silently.
+- Do not create mock APIs pretending to be production APIs.
+- Keep the code modular and maintainable.
+- Use reusable components.
+- Use strict TypeScript where practical.
+- Validate forms.
+- Handle errors.
+- Maintain good accessibility.
+- Build responsive layouts.
+- Test features as they are implemented.
+
+If API keys or credentials are missing, build the integration interface, document the missing credentials, and continue implementing the rest of the system.
+
+---
+
+# 30. FINAL PRODUCT EXPECTATION
+
+The final product should be a comprehensive, premium political campaign operations platform.
+
+A campaign executive should be able to log in and understand the overall operational situation within seconds.
+
+A situation-room operator should be able to monitor campaign operations live.
+
+A coordinator should be able to manage personnel in their assigned geography.
+
+A field agent should be able to check in, submit reports, and request assistance from a mobile phone.
+
+A call center operator should be able to receive, record, categorize, and escalate calls.
+
+An incident manager should be able to coordinate incident response.
+
+A logistics manager should be able to manage vehicles, equipment, supplies, and requests.
+
+A campaign administrator should be able to manage the entire system.
+
+The platform should have:
+
+- Exceptional design.
+- Enterprise-grade architecture.
+- Secure Supabase backend.
+- Real-time functionality.
+- Full Nigerian geographic hierarchy.
+- Campaign-wide operations.
+- Mobile-first field functionality.
+- Situation-room capabilities.
+- Powerful reporting.
+- Strong auditability.
+- Excellent usability.
+- Reliable performance.
+
+Build this as a serious, production-grade product that could be deployed in a real campaign headquarters and used by campaign management teams every day.
+
+**Prioritize quality, security, usability, completeness, and operational reliability over rushing to create a large number of unfinished features.**
+
+Begin by inspecting the existing project and documenting the architecture. Then start implementing the system feature by feature. Continue working until the implemented modules are functional, integrated, tested, and documented.
